@@ -630,9 +630,49 @@
           <h1>CWDK T&J Bank</h1>
         </div>
         <p class="header-subtitle">가족 자산 관리 시스템 ✨</p>
-        <div class="user-info" id="userInfo">로그인 중...</div>
+      <button id="installAppBtn" class="install-btn" style="display: none;">
+        📥 앱 설치
+      </button>
+      <div class="user-info" id="userInfo">로그인 중...</div>
       </div>
     </div>
+
+    <!-- ... (rest of the body) ... -->
+
+  <script>
+    // ... existing variables ...
+    let deferredPrompt;
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      // Prevent the mini-infobar from appearing on mobile
+      e.preventDefault();
+      // Stash the event so it can be triggered later.
+      deferredPrompt = e;
+      // Update UI notify the user they can install the PWA
+      const installBtn = document.getElementById('installAppBtn');
+      if (installBtn) {
+        installBtn.style.display = 'inline-flex';
+      }
+      console.log('Capture beforeinstallprompt event');
+    });
+
+    document.getElementById('installAppBtn')?.addEventListener('click', async () => {
+      if (!deferredPrompt) {
+        return;
+      }
+      // Show the install prompt
+      deferredPrompt.prompt();
+      // Wait for the user to respond to the prompt
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log(`User response to the install prompt: ${outcome}`);
+      // We've used the prompt, and can't use it again, throw it away
+      deferredPrompt = null;
+      // Hide the button
+      document.getElementById('installAppBtn').style.display = 'none';
+    });
+
+    // ... (rest of the script) ...
+
 
     <div class="card">
       <div style="font-weight:800; font-size:1rem; display:flex; align-items:center; gap:8px;">
