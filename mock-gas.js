@@ -36,7 +36,7 @@ if (typeof google === 'undefined') {
                 ],
                 year: 2025,
                 availableYears: [2024, 2025],
-                userName: '테스트유저', // '부모님'으로 바꾸면 관리자 모드 테스트 가능
+                userName: 'Guest', // '부모님'으로 바꾸면 관리자 모드 테스트 가능
                 isParent: false // true로 바꾸면 관리자 모드 테스트 가능
               });
             }
@@ -53,12 +53,12 @@ if (typeof google === 'undefined') {
                   {
                     rowIndex: 2,
                     requestTime: '2025-02-01 10:00',
-                    requester: '채원',
+                    requester: 'CW',
                     actionType: '세금 사용',
                     chaewon: -5000,
                     dokwon: 0,
                     memo: '공책 구매',
-                    details: '구매자: 채원, 총액: 5,000원'
+                    details: '구매자: CW, 총액: 5,000원'
                   }
                 ]
               });
