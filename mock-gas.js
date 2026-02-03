@@ -12,6 +12,36 @@ if (typeof google === 'undefined') {
       run: {
         withSuccessHandler: function(successCallback) {
           this._successHandler = successCallback;
+          // [익명화] GitHub Pages 환경(Mock)에서는 개인정보 보호를 위해 이름을 CW/DK로 강제 변경
+          setTimeout(() => {
+            const replacements = [
+              { selector: '.tax-item.chaewon .tax-label', text: 'CW 💜' },
+              { selector: '.tax-item.dokwon .tax-label', text: 'DK 💙' },
+              { selector: '#btn-chaewon', text: 'CW 💜' },
+              { selector: '#btn-dokwon', text: 'DK 💙' },
+              { selector: '#btn-buyer-chaewon span:last-child', text: 'CW' },
+              { selector: '#btn-buyer-dokwon span:last-child', text: 'DK' },
+              // Dues section text content replacement by finding specific structure
+              { selector: '#duesTab div[style*="justify-content:space-between"] span:first-child', 
+                filter: (el) => el.innerText === '채원', text: 'CW' },
+              { selector: '#duesTab div[style*="justify-content:space-between"] span:first-child', 
+                filter: (el) => el.innerText === '도권', text: 'DK' },
+               // Table header
+              { selector: '.record-header div:nth-child(2)', text: 'CW' },
+              { selector: '.record-header div:nth-child(3)', text: 'DK' }
+            ];
+
+            replacements.forEach(item => {
+              const elements = document.querySelectorAll(item.selector);
+              elements.forEach(el => {
+                if (item.filter && !item.filter(el)) return;
+                el.innerText = item.text;
+                // Add a visual indicator for mock mode if needed
+              });
+            });
+            console.log('🔒 UI Anonymized for Guest Mode');
+          }, 100); // UI 렌더링 후 실행
+          
           return this;
         },
         withFailureHandler: function(failureCallback) {
