@@ -6,9 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CWDK T&J Bank</title>
   
-  <link rel="manifest" href="manifest.json">
-  <link rel="icon" href="app-icon.jpg" type="image/jpeg">
-  <link rel="apple-touch-icon" href="app-icon.jpg">
+  <!-- GitHub Pages에 호스팅된 이미지 절대 경로 사용 -->
+  <link rel="manifest" href="https://ngc7331-kor.github.io/MyHomeTax/manifest.json">
+  <link rel="icon" href="https://ngc7331-kor.github.io/MyHomeTax/app-icon.jpg" type="image/jpeg">
+  <link rel="apple-touch-icon" href="https://ngc7331-kor.github.io/MyHomeTax/app-icon.jpg">
   
   <style>
     :root {
@@ -58,7 +59,7 @@
     .header-logo {
       width: 80px;
       height: 80px;
-      border-radius: 20px; /* Changed from 50% to rounded square to fit the new logo better */
+      border-radius: 20px;
       object-fit: cover;
       box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
@@ -83,6 +84,7 @@
       font-size: 0.9rem;
       color: var(--text-sub);
       font-weight: 500;
+      margin-bottom: 5px;
     }
 
     .user-info {
@@ -99,6 +101,22 @@
     .user-info.parent {
       background: rgba(16, 185, 129, 0.1);
       color: #10b981;
+    }
+
+    .install-btn {
+      background: #2563eb;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      margin-top: 5px;
+      box-shadow: 0 2px 5px rgba(37, 99, 235, 0.2);
     }
 
     .card {
@@ -624,55 +642,19 @@
 
   <div class="container">
     <div class="header">
-      <img src="app-icon.jpg" alt="CWDK Bank Logo" class="header-logo">
+      <!-- GitHub Pages에서 이미지 로드 -->
+      <img src="https://ngc7331-kor.github.io/MyHomeTax/app-icon.jpg" alt="CWDK Bank Logo" class="header-logo">
       <div class="header-content">
         <div class="header-title">
           <h1>CWDK T&J Bank</h1>
         </div>
         <p class="header-subtitle">가족 자산 관리 시스템 ✨</p>
-      <button id="installAppBtn" class="install-btn" style="display: none;">
-        📥 앱 설치
-      </button>
-      <div class="user-info" id="userInfo">로그인 중...</div>
+        <button id="installAppBtn" class="install-btn" style="display: none;">
+          📥 앱 설치
+        </button>
+        <div class="user-info" id="userInfo">로그인 중...</div>
       </div>
     </div>
-
-    <!-- ... (rest of the body) ... -->
-
-  <script>
-    // ... existing variables ...
-    let deferredPrompt;
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-      // Prevent the mini-infobar from appearing on mobile
-      e.preventDefault();
-      // Stash the event so it can be triggered later.
-      deferredPrompt = e;
-      // Update UI notify the user they can install the PWA
-      const installBtn = document.getElementById('installAppBtn');
-      if (installBtn) {
-        installBtn.style.display = 'inline-flex';
-      }
-      console.log('Capture beforeinstallprompt event');
-    });
-
-    document.getElementById('installAppBtn')?.addEventListener('click', async () => {
-      if (!deferredPrompt) {
-        return;
-      }
-      // Show the install prompt
-      deferredPrompt.prompt();
-      // Wait for the user to respond to the prompt
-      const { outcome } = await deferredPrompt.userChoice;
-      console.log(`User response to the install prompt: ${outcome}`);
-      // We've used the prompt, and can't use it again, throw it away
-      deferredPrompt = null;
-      // Hide the button
-      document.getElementById('installAppBtn').style.display = 'none';
-    });
-
-    // ... (rest of the script) ...
-
 
     <div class="card">
       <div style="font-weight:800; font-size:1rem; display:flex; align-items:center; gap:8px;">
@@ -848,6 +830,7 @@
   </div>
 
   <script src="mock-gas.js"></script>
+
   <script>
     let currentPerson = 'chaewon';
     let currentYear = new Date().getFullYear();
@@ -859,6 +842,36 @@
     let userName = '';
     let isParent = false;
     let pendingApprovals = [];
+    let deferredPrompt;
+
+    // PWA Install Prompt Logic
+    window.addEventListener('beforeinstallprompt', (e) => {
+      // Prevent the mini-infobar from appearing on mobile
+      e.preventDefault();
+      // Stash the event so it can be triggered later.
+      deferredPrompt = e;
+      // Update UI notify the user they can install the PWA
+      const installBtn = document.getElementById('installAppBtn');
+      if (installBtn) {
+        installBtn.style.display = 'inline-flex';
+      }
+      console.log('Capture beforeinstallprompt event');
+    });
+
+    document.getElementById('installAppBtn')?.addEventListener('click', async () => {
+      if (!deferredPrompt) {
+        return;
+      }
+      // Show the install prompt
+      deferredPrompt.prompt();
+      // Wait for the user to respond to the prompt
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log(`User response to the install prompt: ${outcome}`);
+      // We've used the prompt, and can't use it again, throw it away
+      deferredPrompt = null;
+      // Hide the button
+      document.getElementById('installAppBtn').style.display = 'none';
+    });
 
     function initializeDateFields() {
       const today = new Date().toISOString().split('T')[0];
@@ -880,7 +893,10 @@
       
       if (typeof google === 'undefined' || !google.script) {
         console.error('Google Apps Script 환경이 아닙니다');
-        alert('오류: Apps Script로 배포되지 않았습니다.');
+        // mock-gas.js takes over if loaded, otherwise show alert
+        if (typeof google === 'undefined') {
+          alert('오류: Apps Script로 배포되지 않았습니다.');
+        }
         return;
       }
       
