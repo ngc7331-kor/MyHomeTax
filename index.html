@@ -154,11 +154,11 @@
 
     .tax-item:active { transform: scale(0.98); }
 
-    .tax-item.chaewon { 
+    .tax-item.cw { 
       background: rgba(192, 132, 252, 0.1); 
       border: 1px solid rgba(192, 132, 252, 0.2); 
     }
-    .tax-item.dokwon { 
+    .tax-item.dk { 
       background: rgba(99, 102, 241, 0.1); 
       border: 1px solid rgba(99, 102, 241, 0.2); 
     }
@@ -168,8 +168,8 @@
       font-weight: 700; 
       margin-bottom: 6px; 
     }
-    .chaewon .tax-label { color: #9333ea; }
-    .dokwon .tax-label { color: #4f46e5; }
+    .cw .tax-label { color: #9333ea; }
+    .dk .tax-label { color: #4f46e5; }
 
     .tax-amount { 
       font-size: 1.3rem; 
@@ -257,12 +257,12 @@
       transition: all 0.2s;
     }
 
-    .person-btn.active.chaewon { 
+    .person-btn.active.cw { 
       border-color: var(--primary); 
       background: white; 
       color: var(--primary); 
     }
-    .person-btn.active.dokwon { 
+    .person-btn.active.dk { 
       border-color: var(--secondary); 
       background: white; 
       color: var(--secondary); 
@@ -281,6 +281,7 @@
     }
     .input-field:focus { 
       border-color: var(--primary); 
+      background: white; 
       background: white; 
     }
 
@@ -427,13 +428,13 @@
       color: #10b981;
     }
 
-    .buyer-btn.active.chaewon {
+    .buyer-btn.active.cw {
       border-color: var(--primary);
       background: rgba(192, 132, 252, 0.1);
       color: var(--primary);
     }
 
-    .buyer-btn.active.dokwon {
+    .buyer-btn.active.dk {
       border-color: var(--secondary);
       background: rgba(99, 102, 241, 0.1);
       color: var(--secondary);
@@ -548,8 +549,8 @@
       text-align: right;
     }
 
-    .record-amount.chaewon { color: #9333ea; }
-    .record-amount.dokwon { color: #4f46e5; }
+    .record-amount.cw { color: #9333ea; }
+    .record-amount.dk { color: #4f46e5; }
 
     .year-selector {
       display: flex;
@@ -671,18 +672,18 @@
         <span>💰</span> 현재 누적 세금
       </div>
       <div class="tax-grid">
-        <div class="tax-item chaewon">
-          <div class="tax-label">채원 💜</div>
-          <div class="tax-amount" id="chaewonTotal">0원</div>
+        <div class="tax-item cw">
+          <div class="tax-label">cw 💜</div>
+          <div class="tax-amount" id="cwTotal">0원</div>
           <div style="font-size:0.75rem; color:#9333ea; margin-top:4px; opacity:0.8;">
-            환급액: <span id="chaewonRefund">0원</span>
+            환급액: <span id="cwRefund">0원</span>
           </div>
         </div>
-        <div class="tax-item dokwon">
-          <div class="tax-label">도권 💙</div>
-          <div class="tax-amount" id="dokwonTotal">0원</div>
+        <div class="tax-item dk">
+          <div class="tax-label">dk 💙</div>
+          <div class="tax-amount" id="dkTotal">0원</div>
           <div style="font-size:0.75rem; color:#4f46e5; margin-top:4px; opacity:0.8;">
-            환급액: <span id="dokwonRefund">0원</span>
+            환급액: <span id="dkRefund">0원</span>
           </div>
         </div>
       </div>
@@ -712,8 +713,8 @@
         <div class="form-group">
           <label class="form-label">누구의 용돈인가요?</label>
           <div class="person-select">
-            <button class="person-btn active chaewon" id="btn-chaewon" data-person="chaewon">채원 💜</button>
-            <button class="person-btn dokwon" id="btn-dokwon" data-person="dokwon">도권 💙</button>
+            <button class="person-btn active cw" id="btn-cw" data-person="cw">cw 💜</button>
+            <button class="person-btn dk" id="btn-dk" data-person="dk">dk 💙</button>
           </div>
         </div>
 
@@ -743,11 +744,11 @@
           <label class="form-label">가족회비 납부</label>
           <div style="background:#f1f5f9; padding:15px; border-radius:16px; margin-bottom:15px;">
             <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-              <span>채원</span>
+              <span>cw</span>
               <span style="font-weight:700;">5,000원</span>
             </div>
             <div style="display:flex; justify-content:space-between;">
-              <span>도권</span>
+              <span>dk</span>
               <span style="font-weight:700;">3,000원</span>
             </div>
           </div>
@@ -782,13 +783,13 @@
                 <span class="icon">👨👩👧👦</span>
                 <span>함께</span>
               </button>
-              <button type="button" class="buyer-btn chaewon" id="btn-buyer-chaewon" data-buyer="chaewon">
+              <button type="button" class="buyer-btn cw" id="btn-buyer-cw" data-buyer="cw">
                 <span class="icon">💜</span>
-                <span>채원</span>
+                <span>cw</span>
               </button>
-              <button type="button" class="buyer-btn dokwon" id="btn-buyer-dokwon" data-buyer="dokwon">
+              <button type="button" class="buyer-btn dk" id="btn-buyer-dk" data-buyer="dk">
                 <span class="icon">💙</span>
-                <span>도권</span>
+                <span>dk</span>
               </button>
             </div>
           </div>
@@ -829,8 +830,8 @@
         
         <div class="record-header">
           <div>날짜 (내역)</div>
-          <div>채원</div>
-          <div>도권</div>
+          <div>cw</div>
+          <div>dk</div>
         </div>
         
         <div id="recordList">
@@ -847,7 +848,7 @@
   <script src="mock-gas.js"></script>
 
   <script>
-    let currentPerson = 'chaewon';
+    let currentPerson = 'cw';
     let currentYear = new Date().getFullYear();
     let availableYears = [];
     let editMode = false;
@@ -919,11 +920,11 @@
         .withSuccessHandler(function(data) {
           console.log('데이터 로드 성공:', data);
           
-          document.getElementById('chaewonTotal').textContent = data.chaewonTotal.toLocaleString() + '원';
-          document.getElementById('dokwonTotal').textContent = data.dokwonTotal.toLocaleString() + '원';
-          document.getElementById('totalTax').textContent = (data.chaewonTotal + data.dokwonTotal).toLocaleString() + '원';
-          document.getElementById('chaewonRefund').textContent = data.chaewonRefund.toLocaleString() + '원';
-          document.getElementById('dokwonRefund').textContent = data.dokwonRefund.toLocaleString() + '원';
+          document.getElementById('cwTotal').textContent = data.cwTotal.toLocaleString() + '원';
+          document.getElementById('dkTotal').textContent = data.dkTotal.toLocaleString() + '원';
+          document.getElementById('totalTax').textContent = (data.cwTotal + data.dkTotal).toLocaleString() + '원';
+          document.getElementById('cwRefund').textContent = data.cwRefund.toLocaleString() + '원';
+          document.getElementById('dkRefund').textContent = data.dkRefund.toLocaleString() + '원';
           
           availableYears = data.availableYears || [data.year];
           currentYear = data.year;
@@ -992,12 +993,12 @@
           '<div style="margin-bottom:10px; color:#64748b; font-size:0.85rem;">신청자: ' + item.requester + '</div>' +
           '<div class="approval-details">' +
             '<div class="approval-detail">' +
-              '<div class="approval-detail-label">채원</div>' +
-              '<div class="approval-detail-value" style="color:#9333ea;">' + item.chaewon.toLocaleString() + '원</div>' +
+              '<div class="approval-detail-label">cw</div>' +
+              '<div class="approval-detail-value" style="color:#9333ea;">' + item.cw.toLocaleString() + '원</div>' +
             '</div>' +
             '<div class="approval-detail">' +
-              '<div class="approval-detail-label">도권</div>' +
-              '<div class="approval-detail-value" style="color:#4f46e5;">' + item.dokwon.toLocaleString() + '원</div>' +
+              '<div class="approval-detail-label">dk</div>' +
+              '<div class="approval-detail-value" style="color:#4f46e5;">' + item.dk.toLocaleString() + '원</div>' +
             '</div>' +
           '</div>' +
           '<div style="margin-top:10px; padding:10px; background:#f8fafc; border-radius:10px; font-size:0.85rem;">' +
@@ -1104,8 +1105,8 @@
       }
       
       listEl.innerHTML = records.map((record, index) => {
-        const chaewonVal = Number(record.chaewon) || 0;
-        const dokwonVal = Number(record.dokwon) || 0;
+        const cwVal = Number(record.cw) || 0;
+        const dkVal = Number(record.dk) || 0;
         
         return '<div class="record-item" id="record-' + index + '" data-index="' + index + '">' +
           '<div>' +
@@ -1114,12 +1115,12 @@
             '<input type="text" class="edit-input" id="memo-input-' + index + '" value="' + record.memo + '" style="display:none;">' +
           '</div>' +
           '<div>' +
-            '<div class="record-amount chaewon" id="chaewon-' + index + '">' + chaewonVal.toLocaleString() + '원</div>' +
-            '<input type="number" class="edit-input" id="chaewon-input-' + index + '" value="' + chaewonVal + '" style="display:none;">' +
+            '<div class="record-amount cw" id="cw-' + index + '">' + cwVal.toLocaleString() + '원</div>' +
+            '<input type="number" class="edit-input" id="cw-input-' + index + '" value="' + cwVal + '" style="display:none;">' +
           '</div>' +
           '<div>' +
-            '<div class="record-amount dokwon" id="dokwon-' + index + '">' + dokwonVal.toLocaleString() + '원</div>' +
-            '<input type="number" class="edit-input" id="dokwon-input-' + index + '" value="' + dokwonVal + '" style="display:none;">' +
+            '<div class="record-amount dk" id="dk-' + index + '">' + dkVal.toLocaleString() + '원</div>' +
+            '<input type="number" class="edit-input" id="dk-input-' + index + '" value="' + dkVal + '" style="display:none;">' +
           '</div>' +
           '<div class="record-actions">' +
             '<button class="btn-icon edit" id="edit-btn-' + index + '" onclick="toggleEdit(' + index + ')" style="display:none;">✏️</button>' +
@@ -1144,11 +1145,11 @@
 
     function toggleEdit(index) {
       document.getElementById('memo-' + index).style.display = 'none';
-      document.getElementById('chaewon-' + index).style.display = 'none';
-      document.getElementById('dokwon-' + index).style.display = 'none';
+      document.getElementById('cw-' + index).style.display = 'none';
+      document.getElementById('dk-' + index).style.display = 'none';
       document.getElementById('memo-input-' + index).style.display = 'block';
-      document.getElementById('chaewon-input-' + index).style.display = 'block';
-      document.getElementById('dokwon-input-' + index).style.display = 'block';
+      document.getElementById('cw-input-' + index).style.display = 'block';
+      document.getElementById('dk-input-' + index).style.display = 'block';
       document.getElementById('edit-btn-' + index).style.display = 'none';
       document.getElementById('save-btn-' + index).style.display = 'flex';
       document.getElementById('cancel-btn-' + index).style.display = 'flex';
@@ -1158,14 +1159,14 @@
     function cancelEdit(index) {
       const record = currentRecords[index];
       document.getElementById('memo-input-' + index).value = record.memo;
-      document.getElementById('chaewon-input-' + index).value = record.chaewon;
-      document.getElementById('dokwon-input-' + index).value = record.dokwon;
+      document.getElementById('cw-input-' + index).value = record.cw;
+      document.getElementById('dk-input-' + index).value = record.dk;
       document.getElementById('memo-' + index).style.display = 'block';
-      document.getElementById('chaewon-' + index).style.display = 'block';
-      document.getElementById('dokwon-' + index).style.display = 'block';
+      document.getElementById('cw-' + index).style.display = 'block';
+      document.getElementById('dk-' + index).style.display = 'block';
       document.getElementById('memo-input-' + index).style.display = 'none';
-      document.getElementById('chaewon-input-' + index).style.display = 'none';
-      document.getElementById('dokwon-input-' + index).style.display = 'none';
+      document.getElementById('cw-input-' + index).style.display = 'none';
+      document.getElementById('dk-input-' + index).style.display = 'none';
       document.getElementById('edit-btn-' + index).style.display = 'flex';
       document.getElementById('save-btn-' + index).style.display = 'none';
       document.getElementById('cancel-btn-' + index).style.display = 'none';
@@ -1175,8 +1176,8 @@
     function saveRecord(index) {
       const record = currentRecords[index];
       const newMemo = document.getElementById('memo-input-' + index).value;
-      const newChaewon = parseInt(document.getElementById('chaewon-input-' + index).value) || 0;
-      const newDokwon = parseInt(document.getElementById('dokwon-input-' + index).value) || 0;
+      const newCw = parseInt(document.getElementById('cw-input-' + index).value) || 0;
+      const newDk = parseInt(document.getElementById('dk-input-' + index).value) || 0;
       
       if (!confirm('수정하시겠습니까?')) return;
       
@@ -1196,7 +1197,7 @@
           hideLoading();
           alert('수정 실패: ' + error);
         })
-        .updateRecord(currentYear, record.rowIndex, newChaewon, newDokwon, newMemo);
+        .updateRecord(currentYear, record.rowIndex, newCw, newDk, newMemo);
     }
 
     function deleteRecord(index) {
@@ -1315,7 +1316,7 @@
       const memo = document.getElementById('duesMemo').value || '가족회비';
       const dateStr = document.getElementById('duesDate').value;
       
-      if (!confirm('회비를 납부하시겠습니까?\n채원: 5,000원\n도권: 3,000원')) return;
+      if (!confirm('회비를 납부하시겠습니까?\ncw: 5,000원\ndk: 3,000원')) return;
       
       showLoading();
       google.script.run
@@ -1372,17 +1373,17 @@
         desc = desc + ' (연말정산 미반영)';
       }
 
-      let chaewonAmount, dokwonAmount;
+      let cwAmount, dkAmount;
       
       if (currentBuyer === 'together') {
-        chaewonAmount = amount / 2;
-        dokwonAmount = amount / 2;
-      } else if (currentBuyer === 'chaewon') {
-        chaewonAmount = amount;
-        dokwonAmount = 0;
-      } else if (currentBuyer === 'dokwon') {
-        chaewonAmount = 0;
-        dokwonAmount = amount;
+        cwAmount = amount / 2;
+        dkAmount = amount / 2;
+      } else if (currentBuyer === 'cw') {
+        cwAmount = amount;
+        dkAmount = 0;
+      } else if (currentBuyer === 'dk') {
+        cwAmount = 0;
+        dkAmount = amount;
       }
       
       showLoading();
@@ -1392,7 +1393,7 @@
           if (result.needsApproval) {
             alert('승인 요청이 완료되었습니다!\n부모님 승인 후 기록됩니다.');
           } else {
-            alert('기록되었습니다!\n채원: ' + Math.abs(result.chaewon).toLocaleString() + '원\n도권: ' + Math.abs(result.dokwon).toLocaleString() + '원');
+            alert('기록되었습니다!\ncw: ' + Math.abs(result.cw).toLocaleString() + '원\ndk: ' + Math.abs(result.dk).toLocaleString() + '원');
           }
           document.getElementById('purchaseAmount').value = '';
           document.getElementById('purchaseDesc').value = '';
@@ -1404,7 +1405,7 @@
           hideLoading();
           alert('실패: ' + error);
         })
-        .requestPurchase(chaewonAmount, dokwonAmount, desc, dateStr);
+        .requestPurchase(cwAmount, dkAmount, desc, dateStr);
     });
 
     window.onload = function() {
