@@ -1,14 +1,15 @@
 // Code.gs - 구글 Apps Script 백엔드 (승인 시스템)
 
 // 허용된 이메일 목록 (우리 가족 이메일) - ⚠️ 배포 시 실제 가족 이메일로 수정하세요
+// 허용된 이메일 목록 (우리 가족 이메일)
 const ALLOWED_EMAILS = [
-  "parent@example.com", // 부모님 이메일
-  "daughter@example.com", // 채원 이메일
-  "son@example.com", // 도권 이메일
+  'taeoh0311@gmail.com',      // 부모님 (아빠)
+  'cwcw0405@gmail.com',       // 채원
+  'dokwon0807@gmail.com'      // 도권
 ];
 
 // 부모님 이메일 (알림 받을 사람)
-const PARENT_EMAIL = "parent@example.com";
+const PARENT_EMAIL = 'taeoh0311@gmail.com';
 
 // 현재 사용자가 부모님인지 확인
 function isParent() {
