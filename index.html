@@ -88,6 +88,25 @@
       margin-bottom: 5px;
     }
 
+    /* PWA Install Button */
+    .install-btn {
+      margin-top: 15px;
+      background: linear-gradient(135deg, #c084fc 0%, #a855f7 100%);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 25px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(192, 132, 252, 0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .install-btn:active { transform: scale(0.95); }
+
     .user-info {
       background: rgba(99, 102, 241, 0.1);
       padding: 8px 16px;
@@ -659,6 +678,11 @@
         </div>
         <p class="header-subtitle">가족 자산 관리 시스템 ✨</p>
         <div class="user-info" id="userInfo">로그인 중...</div>
+        
+        <!-- PWA Install Button -->
+        <button id="installAppBtn" class="install-btn" style="display: none;">
+          📥 앱 설치하기
+        </button>
       </div>
     </div>
     
