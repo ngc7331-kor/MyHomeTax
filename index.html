@@ -673,14 +673,14 @@
       </div>
       <div class="tax-grid">
         <div class="tax-item cw">
-          <div class="tax-label">cw 💜</div>
+          <div class="tax-label">채원 💜</div>
           <div class="tax-amount" id="cwTotal">0원</div>
           <div style="font-size:0.75rem; color:#9333ea; margin-top:4px; opacity:0.8;">
             환급액: <span id="cwRefund">0원</span>
           </div>
         </div>
         <div class="tax-item dk">
-          <div class="tax-label">dk 💙</div>
+          <div class="tax-label">도권 💙</div>
           <div class="tax-amount" id="dkTotal">0원</div>
           <div style="font-size:0.75rem; color:#4f46e5; margin-top:4px; opacity:0.8;">
             환급액: <span id="dkRefund">0원</span>
@@ -713,8 +713,8 @@
         <div class="form-group">
           <label class="form-label">누구의 용돈인가요?</label>
           <div class="person-select">
-            <button class="person-btn active cw" id="btn-cw" data-person="cw">cw 💜</button>
-            <button class="person-btn dk" id="btn-dk" data-person="dk">dk 💙</button>
+            <button class="person-btn active cw" id="btn-cw" data-person="cw">채원 💜</button>
+            <button class="person-btn dk" id="btn-dk" data-person="dk">도권 💙</button>
           </div>
         </div>
 
@@ -744,11 +744,11 @@
           <label class="form-label">가족회비 납부</label>
           <div style="background:#f1f5f9; padding:15px; border-radius:16px; margin-bottom:15px;">
             <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-              <span>cw</span>
+              <span>채원</span>
               <span style="font-weight:700;">5,000원</span>
             </div>
             <div style="display:flex; justify-content:space-between;">
-              <span>dk</span>
+              <span>도권</span>
               <span style="font-weight:700;">3,000원</span>
             </div>
           </div>
@@ -785,11 +785,11 @@
               </button>
               <button type="button" class="buyer-btn cw" id="btn-buyer-cw" data-buyer="cw">
                 <span class="icon">💜</span>
-                <span>cw</span>
+                <span>채원</span>
               </button>
               <button type="button" class="buyer-btn dk" id="btn-buyer-dk" data-buyer="dk">
                 <span class="icon">💙</span>
-                <span>dk</span>
+                <span>도권</span>
               </button>
             </div>
           </div>
@@ -830,8 +830,8 @@
         
         <div class="record-header">
           <div>날짜 (내역)</div>
-          <div>cw</div>
-          <div>dk</div>
+          <div>채원</div>
+          <div>도권</div>
         </div>
         
         <div id="recordList">
@@ -859,6 +859,14 @@
     let isParent = false;
     let pendingApprovals = [];
     let deferredPrompt;
+    
+    // 이름 매핑 함수
+    function getDisplayName(name) {
+      if (name === 'cw') return '채원';
+      if (name === 'dk') return '도권';
+      if (name === 'admin' || name === 'parent' || name === '부모님') return '부모님';
+      return name;
+    }
 
     // PWA Install Prompt Logic
     window.addEventListener('beforeinstallprompt', (e) => {
@@ -932,13 +940,15 @@
           isParent = data.isParent || false;
           
           const userInfoEl = document.getElementById('userInfo');
+          const displayUserName = getDisplayName(userName);
+          
           if (isParent) {
-            userInfoEl.textContent = '👨👩👧👦 ' + userName + ' (관리자)';
+            userInfoEl.textContent = '👨👩👧👦 ' + displayUserName + ' (관리자)';
             userInfoEl.classList.add('parent');
             document.getElementById('approvalTab').style.display = 'block';
             loadPendingApprovals();
           } else {
-            userInfoEl.textContent = '👤 ' + userName;
+            userInfoEl.textContent = '👤 ' + displayUserName;
             userInfoEl.classList.remove('parent');
             document.getElementById('approvalTab').style.display = 'none';
           }
@@ -985,46 +995,48 @@
       }
       
       listEl.innerHTML = pendingApprovals.map((item, index) => {
+        const displayRequester = getDisplayName(item.requester);
         return '<div class="approval-item">' +
           '<div class="approval-header">' +
             '<div class="approval-type">📋 ' + item.actionType + '</div>' +
             '<div class="approval-time">' + item.requestTime + '</div>' +
           '</div>' +
-          '<div style="margin-bottom:10px; color:#64748b; font-size:0.85rem;">신청자: ' + item.requester + '</div>' +
+          '<div style="margin-bottom:10px; color:#64748b; font-size:0.85rem;">신청자: ' + displayRequester + '</div>' +
           '<div class="approval-details">' +
             '<div class="approval-detail">' +
-              '<div class="approval-detail-label">cw</div>' +
+              '<div class="approval-detail-label">채원</div>' +
               '<div class="approval-detail-value" style="color:#9333ea;">' + item.cw.toLocaleString() + '원</div>' +
             '</div>' +
             '<div class="approval-detail">' +
-              '<div class="approval-detail-label">dk</div>' +
+              '<div class="approval-detail-label">도권</div>' +
               '<div class="approval-detail-value" style="color:#4f46e5;">' + item.dk.toLocaleString() + '원</div>' +
             '</div>' +
           '</div>' +
-          '<div style="margin-top:10px; padding:10px; background:#f8fafc; border-radius:10px; font-size:0.85rem;">' +
-            '<div><strong>메모:</strong> ' + item.memo + '</div>' +
-            '<div><strong>날짜:</strong> ' + item.date + '</div>' +
-            (item.details ? '<div style="margin-top:5px; color:#64748b;">' + item.details + '</div>' : '') +
+          '<div style="background:#f8fafc; padding:10px; border-radius:10px; margin-bottom:10px;">' +
+            '<div class="approval-detail-label">상세 내용</div>' +
+            '<div style="font-size:0.9rem; white-space:pre-wrap;">' + item.details + '</div>' +
           '</div>' +
           '<div class="approval-buttons">' +
-            '<button class="btn-approve" onclick="approveItem(' + item.rowIndex + ')">✓ 승인</button>' +
-            '<button class="btn-reject" onclick="rejectItem(' + item.rowIndex + ')">✕ 거부</button>' +
+            '<button class="btn-approve" onclick="approveRequest(' + index + ')">승인</button>' +
+            '<button class="btn-reject" onclick="rejectRequest(' + index + ')">거부</button>' +
           '</div>' +
         '</div>';
       }).join('');
     }
 
-    function approveItem(rowIndex) {
+    function approveRequest(index) {
       if (!confirm('이 요청을 승인하시겠습니까?')) return;
       
+      const item = pendingApprovals[index];
       showLoading();
+      
       google.script.run
         .withSuccessHandler(function(result) {
           hideLoading();
           if (result.success) {
             alert('승인되었습니다!');
             loadPendingApprovals();
-            loadTaxData();
+            loadTaxData(); // 갱신된 데이터 로드
           } else {
             alert('승인 실패: ' + result.message);
           }
@@ -1033,14 +1045,16 @@
           hideLoading();
           alert('승인 실패: ' + error);
         })
-        .approveRequest(rowIndex);
+        .approveRequest(item.row, item.actionType, item.details);
     }
-
-    function rejectItem(rowIndex) {
-      const reason = prompt('거부 사유를 입력하세요 (선택):');
-      if (reason === null) return;
+    
+    function rejectRequest(index) {
+      const reason = prompt('거부 사유를 입력해주세요 (선택사항):');
+      if (reason === null) return; // 취소
       
+      const item = pendingApprovals[index];
       showLoading();
+      
       google.script.run
         .withSuccessHandler(function(result) {
           hideLoading();
@@ -1055,33 +1069,30 @@
           hideLoading();
           alert('거부 실패: ' + error);
         })
-        .rejectRequest(rowIndex, reason);
+        .rejectRequest(item.row, item.actionType, reason);
     }
 
     function updateYearSelector() {
-      const dropdown = document.getElementById('yearDropdown');
-      dropdown.innerHTML = '';
+      const select = document.getElementById('yearDropdown');
+      select.innerHTML = '';
       
-      availableYears.sort((a, b) => b - a).forEach(year => {
+      availableYears.forEach(year => {
         const option = document.createElement('option');
         option.value = year;
         option.textContent = year + '년';
-        if (year === currentYear) option.selected = true;
-        dropdown.appendChild(option);
+        if (year == currentYear) option.selected = true;
+        select.appendChild(option);
       });
       
-      dropdown.onchange = function() {
-        loadYearHistory(parseInt(this.value));
-      };
+      loadYearHistory(currentYear);
     }
 
+    document.getElementById('yearDropdown').addEventListener('change', function() {
+      currentYear = this.value;
+      loadYearHistory(currentYear);
+    });
+
     function loadYearHistory(year) {
-      currentYear = year;
-      updateYearSelector();
-      editMode = false;
-      deleteMode = false;
-      document.getElementById('editModeBtn').textContent = '수정';
-      document.getElementById('deleteModeBtn').textContent = '삭제';
       document.getElementById('recordList').innerHTML = '<div class="empty-state">내역을 불러오는 중...</div>';
       
       google.script.run
@@ -1091,95 +1102,82 @@
         })
         .withFailureHandler(function(error) {
           console.error('내역 로드 실패:', error);
-          document.getElementById('recordList').innerHTML = '<div class="empty-state">내역 로드 실패</div>';
+          document.getElementById('recordList').innerHTML = '<div class="empty-state">내역을 불러오지 못했습니다</div>';
         })
-        .getYearData(year);
+        .getYearHistory(year);
     }
 
     function displayRecords(records) {
       const listEl = document.getElementById('recordList');
       
       if (!records || records.length === 0) {
-        listEl.innerHTML = '<div class="empty-state">기록이 없습니다</div>';
+        listEl.innerHTML = '<div class="empty-state">' + currentYear + '년 내역이 없습니다</div>';
         return;
       }
       
       listEl.innerHTML = records.map((record, index) => {
-        const cwVal = Number(record.cw) || 0;
-        const dkVal = Number(record.dk) || 0;
+        const isEditing = editMode;
         
-        return '<div class="record-item" id="record-' + index + '" data-index="' + index + '">' +
-          '<div>' +
-            '<div class="record-date">' + record.date + '</div>' +
-            '<div class="record-memo" id="memo-' + index + '">' + record.memo + '</div>' +
-            '<input type="text" class="edit-input" id="memo-input-' + index + '" value="' + record.memo + '" style="display:none;">' +
-          '</div>' +
-          '<div>' +
-            '<div class="record-amount cw" id="cw-' + index + '">' + cwVal.toLocaleString() + '원</div>' +
-            '<input type="number" class="edit-input" id="cw-input-' + index + '" value="' + cwVal + '" style="display:none;">' +
-          '</div>' +
-          '<div>' +
-            '<div class="record-amount dk" id="dk-' + index + '">' + dkVal.toLocaleString() + '원</div>' +
-            '<input type="number" class="edit-input" id="dk-input-' + index + '" value="' + dkVal + '" style="display:none;">' +
-          '</div>' +
-          '<div class="record-actions">' +
-            '<button class="btn-icon edit" id="edit-btn-' + index + '" onclick="toggleEdit(' + index + ')" style="display:none;">✏️</button>' +
-            '<button class="btn-icon save" id="save-btn-' + index + '" onclick="saveRecord(' + index + ')" style="display:none;">💾</button>' +
-            '<button class="btn-icon cancel" id="cancel-btn-' + index + '" onclick="cancelEdit(' + index + ')" style="display:none;">❌</button>' +
-            '<button class="btn-icon delete" id="delete-btn-' + index + '" onclick="deleteRecord(' + index + ')" style="display:none;">🗑️</button>' +
-          '</div>' +
-        '</div>';
+        let html = '<div class="record-item ' + (isEditing ? 'editing' : '') + '">';
+        
+        // 날짜 및 정보
+        html += '<div class="record-info">';
+        html += '<div class="record-date">' + record.date + '</div>';
+        html += '<div class="record-memo">' + record.memo + '</div>';
+        html += '</div>';
+        
+        // 금액 (cw)
+        html += '<div class="record-amount cw">';
+        if (record.cw !== 0) {
+          html += record.cw.toLocaleString();
+        } else {
+          html += '-';
+        }
+        html += '</div>';
+        
+        // 금액 (dk)
+        html += '<div class="record-amount dk">';
+        if (record.dk !== 0) {
+          html += record.dk.toLocaleString();
+        } else {
+          html += '-';
+        }
+        html += '</div>';
+        
+        // 액션 버튼
+        if (isEditing) {
+          html += '<div class="record-actions">';
+          html += '<button class="btn-icon edit" onclick="editRecord(' + index + ')" title="수정">✏️</button>';
+          html += '</div>';
+        } else if (deleteMode) {
+          html += '<div class="record-actions">';
+          html += '<button class="btn-icon delete" onclick="deleteRecord(' + index + ')" title="삭제">🗑️</button>';
+          html += '</div>';
+        } else {
+           html += '<div></div>'; // placeholder
+        }
+        
+        html += '</div>';
+        return html;
       }).join('');
       
       updateButtonVisibility();
     }
-
+    
     function updateButtonVisibility() {
-      currentRecords.forEach((_, index) => {
-        const editBtn = document.getElementById('edit-btn-' + index);
-        const deleteBtn = document.getElementById('delete-btn-' + index);
-        if (editBtn) editBtn.style.display = editMode ? 'flex' : 'none';
-        if (deleteBtn) deleteBtn.style.display = deleteMode ? 'flex' : 'none';
-      });
+      // 수정/삭제 모드일 때 버튼 상태 업데이트 UI 로직이 필요하다면 여기에 추가
     }
 
-    function toggleEdit(index) {
-      document.getElementById('memo-' + index).style.display = 'none';
-      document.getElementById('cw-' + index).style.display = 'none';
-      document.getElementById('dk-' + index).style.display = 'none';
-      document.getElementById('memo-input-' + index).style.display = 'block';
-      document.getElementById('cw-input-' + index).style.display = 'block';
-      document.getElementById('dk-input-' + index).style.display = 'block';
-      document.getElementById('edit-btn-' + index).style.display = 'none';
-      document.getElementById('save-btn-' + index).style.display = 'flex';
-      document.getElementById('cancel-btn-' + index).style.display = 'flex';
-      document.getElementById('record-' + index).classList.add('editing');
-    }
-
-    function cancelEdit(index) {
+    function editRecord(index) {
       const record = currentRecords[index];
-      document.getElementById('memo-input-' + index).value = record.memo;
-      document.getElementById('cw-input-' + index).value = record.cw;
-      document.getElementById('dk-input-' + index).value = record.dk;
-      document.getElementById('memo-' + index).style.display = 'block';
-      document.getElementById('cw-' + index).style.display = 'block';
-      document.getElementById('dk-' + index).style.display = 'block';
-      document.getElementById('memo-input-' + index).style.display = 'none';
-      document.getElementById('cw-input-' + index).style.display = 'none';
-      document.getElementById('dk-input-' + index).style.display = 'none';
-      document.getElementById('edit-btn-' + index).style.display = 'flex';
-      document.getElementById('save-btn-' + index).style.display = 'none';
-      document.getElementById('cancel-btn-' + index).style.display = 'none';
-      document.getElementById('record-' + index).classList.remove('editing');
-    }
-
-    function saveRecord(index) {
-      const record = currentRecords[index];
-      const newMemo = document.getElementById('memo-input-' + index).value;
-      const newCw = parseInt(document.getElementById('cw-input-' + index).value) || 0;
-      const newDk = parseInt(document.getElementById('dk-input-' + index).value) || 0;
+      const newMemo = prompt('새로운 내역(메모)을 입력하세요:', record.memo);
+      if (newMemo === null) return;
       
-      if (!confirm('수정하시겠습니까?')) return;
+      const newCw = prompt('cw 금액 수정:', record.cw);
+      if (newCw === null) return;
+      
+      const newDk = prompt('dk 금액 수정:', record.dk);
+      if (newDk === null) return;
       
       showLoading();
       google.script.run
@@ -1232,7 +1230,7 @@
       } else {
         this.textContent = '수정';
       }
-      updateButtonVisibility();
+      loadYearHistory(currentYear); // 리스트 갱신하여 버튼 표시
     });
 
     document.getElementById('deleteModeBtn').addEventListener('click', function() {
@@ -1244,7 +1242,7 @@
       } else {
         this.textContent = '삭제';
       }
-      updateButtonVisibility();
+      loadYearHistory(currentYear); // 리스트 갱신하여 버튼 표시
     });
 
     document.querySelectorAll('.tab').forEach(tab => {
@@ -1316,7 +1314,7 @@
       const memo = document.getElementById('duesMemo').value || '가족회비';
       const dateStr = document.getElementById('duesDate').value;
       
-      if (!confirm('회비를 납부하시겠습니까?\ncw: 5,000원\ndk: 3,000원')) return;
+      if (!confirm('회비를 납부하시겠습니까?\n채원: 5,000원\n도권: 3,000원')) return;
       
       showLoading();
       google.script.run
@@ -1393,7 +1391,7 @@
           if (result.needsApproval) {
             alert('승인 요청이 완료되었습니다!\n부모님 승인 후 기록됩니다.');
           } else {
-            alert('기록되었습니다!\ncw: ' + Math.abs(result.cw).toLocaleString() + '원\ndk: ' + Math.abs(result.dk).toLocaleString() + '원');
+            alert('기록되었습니다!\n채원: ' + Math.abs(result.cw).toLocaleString() + '원\n도권: ' + Math.abs(result.dk).toLocaleString() + '원');
           }
           document.getElementById('purchaseAmount').value = '';
           document.getElementById('purchaseDesc').value = '';
