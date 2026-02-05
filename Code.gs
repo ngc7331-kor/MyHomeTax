@@ -409,6 +409,11 @@ function getYearData(year) {
     }
   }
 
+  // 날짜 기준 내림차순 정렬 (최신순)
+  records.sort((a, b) => {
+    return new Date(b.date) - new Date(a.date);
+  });
+  
   return records;
 }
 
