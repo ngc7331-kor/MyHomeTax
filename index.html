@@ -105,19 +105,26 @@
     }
 
     .install-btn {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      z-index: 1000;
       background: #2563eb;
       color: white;
       border: none;
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-size: 0.8rem;
+      padding: 12px 20px;
+      border-radius: 50px;
+      font-size: 0.9rem;
       font-weight: 700;
       cursor: pointer;
       display: inline-flex;
       align-items: center;
-      gap: 5px;
-      margin-top: 5px;
-      box-shadow: 0 2px 5px rgba(37, 99, 235, 0.2);
+      gap: 8px;
+      box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .install-btn:active {
+      transform: scale(0.95);
     }
 
     .card {
@@ -650,12 +657,14 @@
           <h1>CWDK T&J Bank</h1>
         </div>
         <p class="header-subtitle">가족 자산 관리 시스템 ✨</p>
-        <button id="installAppBtn" class="install-btn" style="display: none;">
-          📥 앱 설치
-        </button>
         <div class="user-info" id="userInfo">로그인 중...</div>
       </div>
     </div>
+    
+    <!-- Floating Install Button -->
+    <button id="installAppBtn" class="install-btn" style="display: none;">
+      📥 앱 설치
+    </button>
 
     <div class="card">
       <div style="font-weight:800; font-size:1rem; display:flex; align-items:center; gap:8px;">
@@ -706,6 +715,12 @@
             <button class="person-btn active chaewon" id="btn-chaewon" data-person="chaewon">채원 💜</button>
             <button class="person-btn dokwon" id="btn-dokwon" data-person="dokwon">도권 💙</button>
           </div>
+        </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">내용 (메모)</label>
+          <input type="text" id="payMemo" class="input-field" placeholder="예: 용돈">
         </div>
         <div class="form-group">
           <label class="form-label">받은 용돈 금액</label>
@@ -1267,6 +1282,7 @@
 
     document.getElementById('recordTaxBtn').addEventListener('click', function() {
       const allowance = parseInt(document.getElementById('allowanceInput').value);
+      const memo = document.getElementById('payMemo').value || '용돈';
       const dateStr = document.getElementById('payDate').value;
       
       if (!allowance || allowance <= 0) {
@@ -1284,6 +1300,7 @@
             alert(result.tax.toLocaleString() + '원이 기록되었습니다!');
           }
           document.getElementById('allowanceInput').value = '';
+          document.getElementById('payMemo').value = '';
           document.getElementById('taxResult').textContent = '0원';
           initializeDateFields();
           loadTaxData();
@@ -1292,7 +1309,7 @@
           hideLoading();
           alert('실패: ' + error);
         })
-        .requestTax(currentPerson, allowance, '용돈', dateStr);
+        .requestTax(currentPerson, allowance, memo, dateStr);
     });
 
     document.getElementById('recordDuesBtn').addEventListener('click', function() {
