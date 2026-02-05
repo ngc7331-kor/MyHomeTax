@@ -1104,7 +1104,7 @@
           console.error('내역 로드 실패:', error);
           document.getElementById('recordList').innerHTML = '<div class="empty-state">내역을 불러오지 못했습니다</div>';
         })
-        .getYearHistory(year);
+        .getYearData(year);
     }
 
     function displayRecords(records) {
