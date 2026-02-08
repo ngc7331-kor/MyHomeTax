@@ -65,6 +65,13 @@ function isParent() {
   return userEmail === emails.parent;
 }
 
+// 접근 권한 확인
+function checkPermission(userEmail) {
+  const emails = getFamilyEmails();
+  const allowed = [emails.parent, emails.cw, emails.dk];
+  return allowed.includes(userEmail);
+}
+
 // ==========================================
 // 📄 메인 로직
 // ==========================================
@@ -216,22 +223,45 @@ function sendApprovalResultEmail(approved, actionType, rejectionReason) {
 }
 
 function doGet() {
-  // 웹 앱 접근 권한 체크
-  // 스크립트 속성에 이메일이 설정되어 있지 않으면 접근을 막거나, 누구나 볼 수 있게 하거나 선택 가능.
-  // 여기서는 기존 로직대로 '가족 이메일 체크'를 수행합니다.
-
   const userEmail = Session.getActiveUser().getEmail();
-  const emails = getFamilyEmails();
-  const allowed = [emails.parent, emails.cw, emails.dk]; // 목록 생성
 
-  // 이메일 설정이 안 되어 있거나 목록에 없으면 에러 페이지 (선택 사항)
-  // 현재는 index.html을 그대로 보여주되, API 호출 시 권한 체크가 이루어 짐.
-  // 혹은 여기서 바로 HTML을 반환.
+  if (!checkPermission(userEmail)) {
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>접근 거부</title>
+        <style>
+          body { display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100vh; margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #f3f4f6; padding: 20px; text-align: center; }
+          .container { background: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 400px; width: 100%; }
+          h2 { color: #ef4444; margin-top: 0; }
+          p { color: #4b5563; line-height: 1.5; }
+          .email { font-weight: bold; color: #1f2937; background: #e5e7eb; padding: 2px 6px; border-radius: 4px; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <h2>⛔ 접근 권한이 없습니다</h2>
+          <p>현재 로그인된 계정:</p>
+          <p class="email">${userEmail || "(알 수 없음)"}</p>
+          <p>허용된 가족 구성원만<br>이 앱을 사용할 수 있습니다.</p>
+        </div>
+      </body>
+      </html>
+    `;
+    return HtmlService.createHtmlOutput(html)
+      .setTitle("접근 거부")
+      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+      .addMetaTag("viewport", "width=device-width, initial-scale=1");
+  }
 
   return HtmlService.createTemplateFromFile("index")
     .evaluate()
     .setTitle("CWDK T&J Bank")
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+    .addMetaTag("viewport", "width=device-width, initial-scale=1");
 }
 
 function getOrCreateLogSheet() {
