@@ -1,1440 +1,1757 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-  <base target="_top">
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CWDK T&J Bank</title>
-  
-  <!-- GitHub Pages에 호스팅된 이미지 절대 경로 사용 -->
-  <link rel="manifest" href="https://ngc7331-kor.github.io/MyHomeTax/manifest.json">
-  <link rel="icon" href="https://ngc7331-kor.github.io/MyHomeTax/app-icon.jpg" type="image/jpeg">
-  <link rel="apple-touch-icon" href="https://ngc7331-kor.github.io/MyHomeTax/app-icon.jpg">
-  
-  <style>
-    :root {
-      --primary: #c084fc;
-      --secondary: #6366f1;
-      --accent: #f472b6;
-      --bg: #f8fafc;
-      --card-bg: rgba(255, 255, 255, 0.7);
-      --text-main: #1e293b;
-      --text-sub: #64748b;
-      --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
-    }
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    body {
-      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
-      background: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%);
-      background-attachment: fixed;
-      color: var(--text-main);
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      padding: 20px;
-    }
-
-    .container {
-      max-width: 500px;
-      margin: 0 auto;
-      width: 100%;
-      flex: 1;
-    }
-
-    .header {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 20px;
-      padding: 40px 0 30px;
-    }
-
-    .header-logo {
-      width: 80px;
-      height: 80px;
-      border-radius: 20px;
-      object-fit: cover;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    }
-
-    .header-content {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-    }
-
-    .header-title h1 {
-      font-size: 2rem;
-      font-weight: 900;
-      letter-spacing: -1px;
-      background: linear-gradient(to right, var(--primary), var(--secondary));
-      -webkit-background-clip: text;
-      background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 4px;
-    }
-
-    .header-subtitle {
-      font-size: 0.9rem;
-      color: var(--text-sub);
-      font-weight: 500;
-      margin-bottom: 5px;
-    }
-
-    /* PWA Install Button */
-    .install-btn {
-      margin-top: 15px;
-      background: linear-gradient(135deg, #c084fc 0%, #a855f7 100%);
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 25px;
-      font-weight: 700;
-      font-size: 0.9rem;
-      cursor: pointer;
-      box-shadow: 0 4px 12px rgba(192, 132, 252, 0.3);
-      transition: transform 0.2s, box-shadow 0.2s;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .install-btn:active { transform: scale(0.95); }
-
-    .user-info {
-      background: rgba(99, 102, 241, 0.1);
-      padding: 8px 16px;
-      border-radius: 12px;
-      display: inline-block;
-      margin-top: 8px;
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--secondary);
-    }
-
-    .user-info.parent {
-      background: rgba(16, 185, 129, 0.1);
-      color: #10b981;
-    }
-
-    .install-btn {
-      position: fixed;
-      bottom: 20px;
-      left: 20px;
-      z-index: 1000;
-      background: #2563eb;
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      border-radius: 50px;
-      font-size: 0.9rem;
-      font-weight: 700;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .install-btn:active {
-      transform: scale(0.95);
-    }
-
-    .card {
-      background: var(--card-bg);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      border-radius: 28px;
-      padding: 24px;
-      margin-bottom: 24px;
-      box-shadow: var(--shadow);
-    }
-
-    .tax-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-top: 15px;
-    }
-
-    .tax-item {
-      padding: 18px;
-      border-radius: 20px;
-      text-align: center;
-      transition: transform 0.3s ease;
-    }
-
-    .tax-item:active { transform: scale(0.98); }
-
-    .tax-item.cw { 
-      background: rgba(192, 132, 252, 0.1); 
-      border: 1px solid rgba(192, 132, 252, 0.2); 
-    }
-    .tax-item.dk { 
-      background: rgba(99, 102, 241, 0.1); 
-      border: 1px solid rgba(99, 102, 241, 0.2); 
-    }
-
-    .tax-label { 
-      font-size: 0.85rem; 
-      font-weight: 700; 
-      margin-bottom: 6px; 
-    }
-    .cw .tax-label { color: #9333ea; }
-    .dk .tax-label { color: #4f46e5; }
-
-    .tax-amount { 
-      font-size: 1.3rem; 
-      font-weight: 800; 
-      margin-bottom: 4px; 
-    }
-
-    .tabs {
-      display: flex;
-      background: rgba(255, 255, 255, 0.5);
-      padding: 6px;
-      border-radius: 20px;
-      margin-bottom: 24px;
-      gap: 4px;
-      flex-wrap: wrap;
-    }
-
-    .tab {
-      flex: 1;
-      border: none;
-      padding: 12px 5px;
-      border-radius: 16px;
-      font-size: 0.75rem;
-      font-weight: 700;
-      cursor: pointer;
-      background: transparent;
-      color: var(--text-sub);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      min-width: 70px;
-    }
-
-    .tab.active {
-      background: white;
-      color: var(--primary);
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    }
-
-    .tab.approval {
-      background: rgba(245, 158, 11, 0.1);
-      color: #f59e0b;
-      position: relative;
-    }
-
-    .tab.approval.active {
-      background: #f59e0b;
-      color: white;
-    }
-
-    .approval-badge {
-      position: absolute;
-      top: -5px;
-      right: -5px;
-      background: #ef4444;
-      color: white;
-      font-size: 0.65rem;
-      padding: 2px 6px;
-      border-radius: 10px;
-      font-weight: 800;
-    }
-
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-
-    .form-group { margin-bottom: 20px; }
-    .form-label { 
-      display: block; 
-      font-size: 0.9rem; 
-      font-weight: 700; 
-      margin-bottom: 10px; 
-      color: var(--text-main); 
-    }
-    
-    .person-select { 
-      display: grid; 
-      grid-template-columns: 1fr 1fr; 
-      gap: 10px; 
-    }
-    .person-btn {
-      padding: 15px;
-      border-radius: 18px;
-      border: 2px solid transparent;
-      background: #f1f5f9;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .person-btn.active.cw { 
-      border-color: var(--primary); 
-      background: white; 
-      color: var(--primary); 
-    }
-    .person-btn.active.dk { 
-      border-color: var(--secondary); 
-      background: white; 
-      color: var(--secondary); 
-    }
-
-    .input-field {
-      width: 100%;
-      padding: 16px;
-      border-radius: 18px;
-      border: 1px solid #e2e8f0;
-      background: rgba(255, 255, 255, 0.8);
-      font-size: 1rem;
-      font-weight: 600;
-      outline: none;
-      transition: border-color 0.3s;
-    }
-    .input-field:focus { 
-      border-color: var(--primary); 
-      background: white; 
-      background: white; 
-    }
-
-    .result-box {
-      background: linear-gradient(135deg, #fff9c4 0%, #fff176 100%);
-      padding: 20px;
-      border-radius: 20px;
-      text-align: center;
-      margin-bottom: 20px;
-      box-shadow: 0 10px 20px rgba(253, 216, 53, 0.2);
-    }
-
-    .btn-primary {
-      width: 100%;
-      padding: 18px;
-      border-radius: 20px;
-      border: none;
-      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-      color: white;
-      font-size: 1.1rem;
-      font-weight: 800;
-      cursor: pointer;
-      box-shadow: 0 10px 25px rgba(99, 102, 241, 0.25);
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .btn-primary:active { 
-      transform: translateY(2px); 
-      box-shadow: 0 5px 10px rgba(99, 102, 241, 0.2); 
-    }
-
-    .approval-item {
-      background: white;
-      border-radius: 16px;
-      padding: 20px;
-      margin-bottom: 15px;
-      border: 2px solid #f59e0b;
-      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.1);
-    }
-
-    .approval-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid #e2e8f0;
-    }
-
-    .approval-type {
-      font-size: 1rem;
-      font-weight: 800;
-      color: #f59e0b;
-    }
-
-    .approval-time {
-      font-size: 0.75rem;
-      color: var(--text-sub);
-    }
-
-    .approval-details {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin: 12px 0;
-    }
-
-    .approval-detail {
-      background: #f8fafc;
-      padding: 10px;
-      border-radius: 10px;
-    }
-
-    .approval-detail-label {
-      font-size: 0.75rem;
-      color: var(--text-sub);
-      margin-bottom: 4px;
-    }
-
-    .approval-detail-value {
-      font-size: 0.9rem;
-      font-weight: 700;
-    }
-
-    .approval-buttons {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 15px;
-    }
-
-    .btn-approve {
-      padding: 12px;
-      border-radius: 12px;
-      border: none;
-      background: #10b981;
-      color: white;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .btn-reject {
-      padding: 12px;
-      border-radius: 12px;
-      border: none;
-      background: #ef4444;
-      color: white;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .btn-approve:active, .btn-reject:active {
-      transform: scale(0.95);
-    }
-
-    .buyer-select {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-    }
-
-    .buyer-btn {
-      padding: 12px;
-      border-radius: 16px;
-      border: 2px solid #e2e8f0;
-      background: white;
-      cursor: pointer;
-      font-weight: 700;
-      font-size: 0.85rem;
-      text-align: center;
-      transition: all 0.2s;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .buyer-btn .icon { font-size: 1.2rem; }
-
-    .buyer-btn.active.together {
-      border-color: #10b981;
-      background: rgba(16, 185, 129, 0.1);
-      color: #10b981;
-    }
-
-    .buyer-btn.active.cw {
-      border-color: var(--primary);
-      background: rgba(192, 132, 252, 0.1);
-      color: var(--primary);
-    }
-
-    .buyer-btn.active.dk {
-      border-color: var(--secondary);
-      background: rgba(99, 102, 241, 0.1);
-      color: var(--secondary);
-    }
-
-    .checkbox-container {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px;
-      background: #f1f5f9;
-      border-radius: 12px;
-      cursor: pointer;
-      user-select: none;
-      width: 100%;
-    }
-
-    .checkbox-container input[type="checkbox"] {
-      width: 20px;
-      height: 20px;
-      cursor: pointer;
-      margin: 0;
-    }
-
-    .checkbox-container span {
-      cursor: pointer;
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--text-main);
-      flex: 1;
-    }
-
-    .record-header {
-      display: grid;
-      grid-template-columns: 2fr 1fr 1fr;
-      gap: 10px;
-      padding: 12px 15px;
-      background: rgba(99, 102, 241, 0.1);
-      border-radius: 12px;
-      margin-bottom: 10px;
-      font-weight: 800;
-      font-size: 0.85rem;
-    }
-
-    .record-header div:nth-child(2) { color: #9333ea; text-align: right; }
-    .record-header div:nth-child(3) { color: #4f46e5; text-align: right; }
-
-    .record-item {
-      display: grid;
-      grid-template-columns: 2fr 1fr 1fr auto;
-      gap: 10px;
-      padding: 15px;
-      background: white;
-      border-radius: 16px;
-      margin-bottom: 10px;
-      border: 1px solid #e2e8f0;
-      align-items: center;
-    }
-
-    .record-item.editing {
-      border-color: var(--primary);
-      background: rgba(192, 132, 252, 0.05);
-    }
-
-    .record-actions {
-      display: flex;
-      gap: 5px;
-    }
-
-    .btn-icon {
-      width: 32px;
-      height: 32px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.75rem;
-      transition: all 0.2s;
-    }
-
-    .btn-icon.edit { background: #10b981; color: white; }
-    .btn-icon.delete { background: #ef4444; color: white; }
-    .btn-icon.save { background: #3b82f6; color: white; }
-    .btn-icon:active { transform: scale(0.9); }
-
-    .edit-input {
-      padding: 6px 10px;
-      border-radius: 8px;
-      border: 1px solid #e2e8f0;
-      font-size: 0.85rem;
-      font-weight: 600;
-      width: 100%;
-    }
-
-    .record-date {
-      font-size: 0.85rem;
-      color: var(--text-sub);
-      font-weight: 600;
-    }
-
-    .record-memo {
-      font-size: 0.85rem;
-      margin-top: 3px;
-      color: var(--text-main);
-    }
-
-    .record-amount {
-      font-size: 0.9rem;
-      font-weight: 700;
-      text-align: right;
-    }
-
-    .record-amount.cw { color: #9333ea; }
-    .record-amount.dk { color: #4f46e5; }
-
-    .year-selector {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-      gap: 10px;
-    }
-
-    .year-dropdown {
-      padding: 10px 16px;
-      border-radius: 12px;
-      border: 1px solid #e2e8f0;
-      background: white;
-      font-weight: 700;
-      font-size: 0.9rem;
-      cursor: pointer;
-      outline: none;
-      flex: 1;
-      max-width: 150px;
-    }
-
-    .edit-mode-btns {
-      display: flex;
-      gap: 8px;
-    }
-
-    .btn-edit, .btn-delete {
-      padding: 8px 16px;
-      border-radius: 12px;
-      border: none;
-      font-weight: 700;
-      font-size: 0.85rem;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .btn-edit { background: #10b981; color: white; }
-    .btn-delete { background: #ef4444; color: white; }
-    .btn-edit:active, .btn-delete:active { transform: scale(0.95); }
-
-    .footer {
-      padding: 20px 0;
-      font-size: 0.75rem;
-      color: var(--text-sub);
-      text-align: right;
-      font-weight: 500;
-      opacity: 0.8;
-    }
-
-    .loading-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(255, 255, 255, 0.8);
-      backdrop-filter: blur(4px);
-      z-index: 9999;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-    }
-    .loading-overlay.active { display: flex; }
-    .spinner { 
-      width: 40px; 
-      height: 40px; 
-      border: 4px solid #f3f3f3; 
-      border-top: 4px solid var(--primary); 
-      border-radius: 50%; 
-      animation: spin 1s linear infinite; 
-    }
-    @keyframes spin { 
-      0% { transform: rotate(0deg); } 
-      100% { transform: rotate(360deg); } 
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 40px 20px;
-      color: var(--text-sub);
-    }
-
-    .buyer-select-wrapper.required::after {
-      content: '구매자를 선택해주세요';
-      display: block;
-      color: #ef4444;
-      font-size: 0.75rem;
-      margin-top: 8px;
-      font-weight: 600;
-    }
-  </style>
-</head>
-<body>
-
-  <div class="loading-overlay" id="loading">
-    <div class="spinner"></div>
-    <p style="margin-top:15px; font-weight:700; color:var(--primary)">처리 중...</p>
-  </div>
-
-  <div class="container">
-    <div class="header">
-      <!-- GitHub Pages에서 이미지 로드 -->
-      <img src="https://ngc7331-kor.github.io/MyHomeTax/app-icon.jpg" alt="CWDK Bank Logo" class="header-logo">
-      <div class="header-content">
-        <div class="header-title">
-          <h1>우리집 세금 (MyHomeTax)</h1>
-        </div>
-        <p class="header-subtitle">가족 자산 관리 시스템 ✨</p>
-        <div class="user-info" id="userInfo">로그인 중...</div>
-        
-        <!-- PWA Install Button -->
-        <button id="installAppBtn" class="install-btn" style="display: none;">
-          📥 앱 설치하기
-        </button>
-      </div>
+  <head>
+    <base target="_top" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CWDK T&J Bank</title>
+
+    <!-- GitHub Pages에 호스팅된 이미지 절대 경로 사용 -->
+    <link
+      rel="manifest"
+      href="https://ngc7331-kor.github.io/MyHomeTax/manifest.json"
+    />
+    <link
+      rel="icon"
+      href="https://ngc7331-kor.github.io/MyHomeTax/app-icon.jpg"
+      type="image/jpeg"
+    />
+    <link
+      rel="apple-touch-icon"
+      href="https://ngc7331-kor.github.io/MyHomeTax/app-icon.jpg"
+    />
+
+    <style>
+      :root {
+        --primary: #c084fc;
+        --secondary: #6366f1;
+        --accent: #f472b6;
+        --bg: #f8fafc;
+        --card-bg: rgba(255, 255, 255, 0.7);
+        --text-main: #1e293b;
+        --text-sub: #64748b;
+        --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+
+      body {
+        font-family:
+          "Pretendard",
+          -apple-system,
+          BlinkMacSystemFont,
+          system-ui,
+          Roboto,
+          sans-serif;
+        background: linear-gradient(135deg, #fdfcfb 0%, #e2d1c3 100%);
+        background-attachment: fixed;
+        color: var(--text-main);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        padding: 20px;
+      }
+
+      .container {
+        max-width: 500px;
+        margin: 0 auto;
+        width: 100%;
+        flex: 1;
+      }
+
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 20px;
+        padding: 40px 0 30px;
+      }
+
+      .header-logo {
+        width: 80px;
+        height: 80px;
+        border-radius: 20px;
+        object-fit: cover;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      .header-content {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .header-title h1 {
+        font-size: 2rem;
+        font-weight: 900;
+        letter-spacing: -1px;
+        background: linear-gradient(to right, var(--primary), var(--secondary));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 4px;
+      }
+
+      .header-subtitle {
+        font-size: 0.9rem;
+        color: var(--text-sub);
+        font-weight: 500;
+        margin-bottom: 5px;
+      }
+
+      /* PWA Install Button */
+      .install-btn {
+        margin-top: 15px;
+        background: linear-gradient(135deg, #c084fc 0%, #a855f7 100%);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 25px;
+        font-weight: 700;
+        font-size: 0.9rem;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(192, 132, 252, 0.3);
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .install-btn:active {
+        transform: scale(0.95);
+      }
+
+      .user-info {
+        background: rgba(99, 102, 241, 0.1);
+        padding: 8px 16px;
+        border-radius: 12px;
+        display: inline-block;
+        margin-top: 8px;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--secondary);
+      }
+
+      .user-info.parent {
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+      }
+
+      .install-btn {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        z-index: 1000;
+        background: #2563eb;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-weight: 700;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+      }
+      .install-btn:active {
+        transform: scale(0.95);
+      }
+
+      .card {
+        background: var(--card-bg);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 28px;
+        padding: 24px;
+        margin-bottom: 24px;
+        box-shadow: var(--shadow);
+      }
+
+      .tax-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-top: 15px;
+      }
+
+      .tax-item {
+        padding: 18px;
+        border-radius: 20px;
+        text-align: center;
+        transition: transform 0.3s ease;
+      }
+
+      .tax-item:active {
+        transform: scale(0.98);
+      }
+
+      .tax-item.cw {
+        background: rgba(192, 132, 252, 0.1);
+        border: 1px solid rgba(192, 132, 252, 0.2);
+      }
+      .tax-item.dk {
+        background: rgba(99, 102, 241, 0.1);
+        border: 1px solid rgba(99, 102, 241, 0.2);
+      }
+
+      .tax-label {
+        font-size: 0.85rem;
+        font-weight: 700;
+        margin-bottom: 6px;
+      }
+      .cw .tax-label {
+        color: #9333ea;
+      }
+      .dk .tax-label {
+        color: #4f46e5;
+      }
+
+      .tax-amount {
+        font-size: 1.3rem;
+        font-weight: 800;
+        margin-bottom: 4px;
+        white-space: nowrap;
+      }
+
+      .tabs {
+        display: flex;
+        background: rgba(255, 255, 255, 0.5);
+        padding: 6px;
+        border-radius: 20px;
+        margin-bottom: 24px;
+        gap: 4px;
+        flex-wrap: wrap;
+      }
+
+      .tab {
+        flex: 1;
+        border: none;
+        padding: 12px 5px;
+        border-radius: 16px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        cursor: pointer;
+        background: transparent;
+        color: var(--text-sub);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        min-width: 70px;
+      }
+
+      .tab.active {
+        background: white;
+        color: var(--primary);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      }
+
+      .tab.approval {
+        background: rgba(245, 158, 11, 0.1);
+        color: #f59e0b;
+        position: relative;
+      }
+
+      .tab.approval.active {
+        background: #f59e0b;
+        color: white;
+      }
+
+      .approval-badge {
+        position: absolute;
+        top: -5px;
+        right: -5px;
+        background: #ef4444;
+        color: white;
+        font-size: 0.65rem;
+        padding: 2px 6px;
+        border-radius: 10px;
+        font-weight: 800;
+      }
+
+      .tab-content {
+        display: none;
+      }
+      .tab-content.active {
+        display: block;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+      .form-label {
+        display: block;
+        font-size: 0.9rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+        color: var(--text-main);
+      }
+
+      .person-select {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+      .person-btn {
+        padding: 15px;
+        border-radius: 18px;
+        border: 2px solid transparent;
+        background: #f1f5f9;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .person-btn.active.cw {
+        border-color: var(--primary);
+        background: white;
+        color: var(--primary);
+      }
+      .person-btn.active.dk {
+        border-color: var(--secondary);
+        background: white;
+        color: var(--secondary);
+      }
+
+      .input-field {
+        width: 100%;
+        padding: 16px;
+        border-radius: 18px;
+        border: 1px solid #e2e8f0;
+        background: rgba(255, 255, 255, 0.8);
+        font-size: 1rem;
+        font-weight: 600;
+        outline: none;
+        transition: border-color 0.3s;
+      }
+      .input-field:focus {
+        border-color: var(--primary);
+        background: white;
+        background: white;
+      }
+
+      .result-box {
+        background: linear-gradient(135deg, #fff9c4 0%, #fff176 100%);
+        padding: 20px;
+        border-radius: 20px;
+        text-align: center;
+        margin-bottom: 20px;
+        box-shadow: 0 10px 20px rgba(253, 216, 53, 0.2);
+      }
+
+      .btn-primary {
+        width: 100%;
+        padding: 18px;
+        border-radius: 20px;
+        border: none;
+        background: linear-gradient(
+          135deg,
+          var(--primary) 0%,
+          var(--secondary) 100%
+        );
+        color: white;
+        font-size: 1.1rem;
+        font-weight: 800;
+        cursor: pointer;
+        box-shadow: 0 10px 25px rgba(99, 102, 241, 0.25);
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+      }
+      .btn-primary:active {
+        transform: translateY(2px);
+        box-shadow: 0 5px 10px rgba(99, 102, 241, 0.2);
+      }
+
+      .approval-item {
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        margin-bottom: 15px;
+        border: 2px solid #f59e0b;
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.1);
+      }
+
+      .approval-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #e2e8f0;
+      }
+
+      .approval-type {
+        font-size: 1rem;
+        font-weight: 800;
+        color: #f59e0b;
+      }
+
+      .approval-time {
+        font-size: 0.75rem;
+        color: var(--text-sub);
+      }
+
+      .approval-details {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin: 12px 0;
+      }
+
+      .approval-detail {
+        background: #f8fafc;
+        padding: 10px;
+        border-radius: 10px;
+      }
+
+      .approval-detail-label {
+        font-size: 0.75rem;
+        color: var(--text-sub);
+        margin-bottom: 4px;
+      }
+
+      .approval-detail-value {
+        font-size: 0.9rem;
+        font-weight: 700;
+      }
+
+      .approval-buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-top: 15px;
+      }
+
+      .btn-approve {
+        padding: 12px;
+        border-radius: 12px;
+        border: none;
+        background: #10b981;
+        color: white;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .btn-reject {
+        padding: 12px;
+        border-radius: 12px;
+        border: none;
+        background: #ef4444;
+        color: white;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .btn-approve:active,
+      .btn-reject:active {
+        transform: scale(0.95);
+      }
+
+      .buyer-select {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+      }
+
+      .buyer-btn {
+        padding: 12px;
+        border-radius: 16px;
+        border: 2px solid #e2e8f0;
+        background: white;
+        cursor: pointer;
+        font-weight: 700;
+        font-size: 0.85rem;
+        text-align: center;
+        transition: all 0.2s;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .buyer-btn .icon {
+        font-size: 1.2rem;
+      }
+
+      .buyer-btn.active.together {
+        border-color: #10b981;
+        background: rgba(16, 185, 129, 0.1);
+        color: #10b981;
+      }
+
+      .buyer-btn.active.cw {
+        border-color: var(--primary);
+        background: rgba(192, 132, 252, 0.1);
+        color: var(--primary);
+      }
+
+      .buyer-btn.active.dk {
+        border-color: var(--secondary);
+        background: rgba(99, 102, 241, 0.1);
+        color: var(--secondary);
+      }
+
+      .checkbox-container {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px;
+        background: #f1f5f9;
+        border-radius: 12px;
+        cursor: pointer;
+        user-select: none;
+        width: 100%;
+      }
+
+      .checkbox-container input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        margin: 0;
+      }
+
+      .checkbox-container span {
+        cursor: pointer;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--text-main);
+        flex: 1;
+      }
+
+      .record-header {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr;
+        gap: 10px;
+        padding: 12px 15px;
+        background: rgba(99, 102, 241, 0.1);
+        border-radius: 12px;
+        margin-bottom: 10px;
+        font-weight: 800;
+        font-size: 0.85rem;
+      }
+
+      .record-header div:nth-child(2) {
+        color: #9333ea;
+        text-align: right;
+      }
+      .record-header div:nth-child(3) {
+        color: #4f46e5;
+        text-align: right;
+      }
+
+      .record-item {
+        display: grid;
+        grid-template-columns: 2fr 1fr 1fr auto;
+        gap: 10px;
+        padding: 15px;
+        background: white;
+        border-radius: 16px;
+        margin-bottom: 10px;
+        border: 1px solid #e2e8f0;
+        align-items: center;
+      }
+
+      .record-item.editing {
+        border-color: var(--primary);
+        background: rgba(192, 132, 252, 0.05);
+      }
+
+      .record-actions {
+        display: flex;
+        gap: 5px;
+      }
+
+      .btn-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        transition: all 0.2s;
+      }
+
+      .btn-icon.edit {
+        background: #10b981;
+        color: white;
+      }
+      .btn-icon.delete {
+        background: #ef4444;
+        color: white;
+      }
+      .btn-icon.save {
+        background: #3b82f6;
+        color: white;
+      }
+      .btn-icon:active {
+        transform: scale(0.9);
+      }
+
+      .edit-input {
+        padding: 6px 10px;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        font-size: 0.85rem;
+        font-weight: 600;
+        width: 100%;
+      }
+
+      .record-date {
+        font-size: 0.85rem;
+        color: var(--text-sub);
+        font-weight: 600;
+      }
+
+      .record-memo {
+        font-size: 0.85rem;
+        margin-top: 3px;
+        color: var(--text-main);
+      }
+
+      .record-amount {
+        font-size: 0.9rem;
+        font-weight: 700;
+        text-align: right;
+      }
+
+      .record-amount.cw {
+        color: #9333ea;
+      }
+      .record-amount.dk {
+        color: #4f46e5;
+      }
+
+      .year-selector {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        gap: 10px;
+      }
+
+      .year-dropdown {
+        padding: 10px 16px;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        background: white;
+        font-weight: 700;
+        font-size: 0.9rem;
+        cursor: pointer;
+        outline: none;
+        flex: 1;
+        max-width: 150px;
+      }
+
+      .edit-mode-btns {
+        display: flex;
+        gap: 8px;
+      }
+
+      .btn-edit,
+      .btn-delete {
+        padding: 8px 16px;
+        border-radius: 12px;
+        border: none;
+        font-weight: 700;
+        font-size: 0.85rem;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+
+      .btn-edit {
+        background: #10b981;
+        color: white;
+      }
+      .btn-delete {
+        background: #ef4444;
+        color: white;
+      }
+      .btn-edit:active,
+      .btn-delete:active {
+        transform: scale(0.95);
+      }
+
+      .footer {
+        padding: 20px 0;
+        font-size: 0.75rem;
+        color: var(--text-sub);
+        text-align: right;
+        font-weight: 500;
+        opacity: 0.8;
+      }
+
+      .loading-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(4px);
+        z-index: 9999;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+      }
+      .loading-overlay.active {
+        display: flex;
+      }
+      .spinner {
+        width: 40px;
+        height: 40px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid var(--primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: var(--text-sub);
+      }
+
+      .buyer-select-wrapper.required::after {
+        content: "구매자를 선택해주세요";
+        display: block;
+        color: #ef4444;
+        font-size: 0.75rem;
+        margin-top: 8px;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="loading-overlay" id="loading">
+      <div class="spinner"></div>
+      <p style="margin-top: 15px; font-weight: 700; color: var(--primary)">
+        처리 중...
+      </p>
     </div>
-    
-    <!-- Floating Install Button -->
-    <button id="installAppBtn" class="install-btn" style="display: none;">
-      📥 앱 설치
-    </button>
 
-    <div class="card">
-      <div style="font-weight:800; font-size:1rem; display:flex; align-items:center; gap:8px;">
-        <span>💰</span> 현재 누적 세금
-      </div>
-      <div class="tax-grid">
-        <div class="tax-item cw">
-          <div class="tax-label">채원 💜</div>
-          <div class="tax-amount" id="cwTotal">0원</div>
-          <div style="font-size:0.75rem; color:#9333ea; margin-top:4px; opacity:0.8;">
-            환급액: <span id="cwRefund">0원</span>
+    <div class="container">
+      <div class="header">
+        <!-- GitHub Pages에서 이미지 로드 -->
+        <img
+          src="https://ngc7331-kor.github.io/MyHomeTax/app-icon.jpg"
+          alt="CWDK Bank Logo"
+          class="header-logo"
+        />
+        <div class="header-content">
+          <div class="header-title">
+            <h1>우리집 세금 (MyHomeTax)</h1>
           </div>
-        </div>
-        <div class="tax-item dk">
-          <div class="tax-label">도권 💙</div>
-          <div class="tax-amount" id="dkTotal">0원</div>
-          <div style="font-size:0.75rem; color:#4f46e5; margin-top:4px; opacity:0.8;">
-            환급액: <span id="dkRefund">0원</span>
-          </div>
+          <p class="header-subtitle">가족 자산 관리 시스템 ✨</p>
+          <div class="user-info" id="userInfo">로그인 중...</div>
+
+          <!-- PWA Install Button -->
+          <button id="installAppBtn" class="install-btn" style="display: none">
+            📥 앱 설치하기
+          </button>
         </div>
       </div>
-      <div style="margin-top:20px; padding-top:15px; border-top:1px solid #eee; display:flex; justify-content:space-between; align-items:center;">
-        <span style="font-weight:700; color:var(--text-sub)">합계</span>
-        <span style="font-size:1.5rem; font-weight:900; color:var(--secondary)" id="totalTax">0원</span>
-      </div>
-    </div>
 
-    <div class="tabs">
-      <button class="tab active" data-tab="pay">세금 계산</button>
-      <button class="tab" data-tab="dues">회비 납부</button>
-      <button class="tab" data-tab="family">세금 사용</button>
-      <button class="tab approval" data-tab="approval" id="approvalTab" style="display:none;">
-        승인 대기
-        <span class="approval-badge" id="approvalBadge" style="display:none;">0</span>
+      <!-- Floating Install Button -->
+      <button id="installAppBtn" class="install-btn" style="display: none">
+        📥 앱 설치
       </button>
-      <button class="tab" data-tab="history">내역 보기</button>
-    </div>
 
-    <div id="payTab" class="tab-content active">
       <div class="card">
-        <div class="form-group">
-          <label class="form-label">날짜</label>
-          <input type="date" id="payDate" class="input-field">
+        <div
+          style="
+            font-weight: 800;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+          "
+        >
+          <span>💰</span> 현재 누적 세금
         </div>
-        <div class="form-group">
-          <label class="form-label">누구의 용돈인가요?</label>
-          <div class="person-select">
-            <button class="person-btn active cw" id="btn-cw" data-person="cw">채원 💜</button>
-            <button class="person-btn dk" id="btn-dk" data-person="dk">도권 💙</button>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label class="form-label">내용 (메모)</label>
-          <input type="text" id="payMemo" class="input-field" placeholder="예: 용돈">
-        </div>
-        <div class="form-group">
-          <label class="form-label">받은 용돈 금액</label>
-          <input type="number" id="allowanceInput" class="input-field" placeholder="금액을 입력하세요">
-        </div>
-        <div class="result-box">
-          <div style="font-size:0.8rem; font-weight:700; color:#856404; margin-bottom:5px;">납부할 세금 (10%)</div>
-          <div style="font-size:2rem; font-weight:900; color:#e65100;" id="taxResult">0원</div>
-        </div>
-        <button class="btn-primary" id="recordTaxBtn">세금 기록하기 🚀</button>
-      </div>
-    </div>
-
-    <div id="duesTab" class="tab-content">
-      <div class="card">
-        <div class="form-group">
-          <label class="form-label">날짜</label>
-          <input type="date" id="duesDate" class="input-field">
-        </div>
-        <div class="form-group">
-          <label class="form-label">가족회비 납부</label>
-          <div style="background:#f1f5f9; padding:15px; border-radius:16px; margin-bottom:15px;">
-            <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
-              <span>채원</span>
-              <span style="font-weight:700;">5,000원</span>
+        <div class="tax-grid">
+          <div class="tax-item cw">
+            <div class="tax-label">채원 💜</div>
+            <div class="tax-amount" id="cwTotal">0원</div>
+            <div
+              style="
+                font-size: 0.75rem;
+                color: #9333ea;
+                margin-top: 4px;
+                opacity: 0.8;
+              "
+            >
+              환급액: <span id="cwRefund">0원</span>
             </div>
-            <div style="display:flex; justify-content:space-between;">
-              <span>도권</span>
-              <span style="font-weight:700;">3,000원</span>
+          </div>
+          <div class="tax-item dk">
+            <div class="tax-label">도권 💙</div>
+            <div class="tax-amount" id="dkTotal">0원</div>
+            <div
+              style="
+                font-size: 0.75rem;
+                color: #4f46e5;
+                margin-top: 4px;
+                opacity: 0.8;
+              "
+            >
+              환급액: <span id="dkRefund">0원</span>
             </div>
           </div>
         </div>
-        <div class="form-group">
-          <label class="form-label">메모 (선택)</label>
-          <input type="text" id="duesMemo" class="input-field" placeholder="예: 12월 회비">
+        <div
+          style="
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          "
+        >
+          <span style="font-weight: 700; color: var(--text-sub)">합계</span>
+          <span
+            style="font-size: 1.5rem; font-weight: 900; color: var(--secondary)"
+            id="totalTax"
+            >0원</span
+          >
         </div>
-        <button class="btn-primary" id="recordDuesBtn">회비 납부 기록 💝</button>
       </div>
-    </div>
 
-    <div id="familyTab" class="tab-content">
-      <div class="card">
-        <div class="form-group">
-          <label class="form-label">날짜</label>
-          <input type="date" id="purchaseDate" class="input-field">
-        </div>
-        <div class="form-group">
-          <label class="form-label">구매 금액</label>
-          <input type="number" id="purchaseAmount" class="input-field" placeholder="금액을 입력하세요">
-        </div>
-        <div class="form-group">
-          <label class="form-label">구매 내용</label>
-          <input type="text" id="purchaseDesc" class="input-field" placeholder="예: 영화 관람">
-        </div>
-        <div class="form-group">
-          <label class="form-label">구매자 선택 *</label>
-          <div class="buyer-select-wrapper" id="buyerSelectWrapper">
-            <div class="buyer-select">
-              <button type="button" class="buyer-btn together active" id="btn-together" data-buyer="together">
-                <span class="icon">👨👩👧👦</span>
-                <span>함께</span>
+      <div class="tabs">
+        <button class="tab active" data-tab="pay">세금 계산</button>
+        <button class="tab" data-tab="dues">회비 납부</button>
+        <button class="tab" data-tab="family">세금 사용</button>
+        <button
+          class="tab approval"
+          data-tab="approval"
+          id="approvalTab"
+          style="display: none"
+        >
+          승인 대기
+          <span class="approval-badge" id="approvalBadge" style="display: none"
+            >0</span
+          >
+        </button>
+        <button class="tab" data-tab="history">내역 보기</button>
+      </div>
+
+      <div id="payTab" class="tab-content active">
+        <div class="card">
+          <div class="form-group">
+            <label class="form-label">날짜</label>
+            <input type="date" id="payDate" class="input-field" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">누구의 용돈인가요?</label>
+            <div class="person-select">
+              <button class="person-btn active cw" id="btn-cw" data-person="cw">
+                채원 💜
               </button>
-              <button type="button" class="buyer-btn cw" id="btn-buyer-cw" data-buyer="cw">
-                <span class="icon">💜</span>
+              <button class="person-btn dk" id="btn-dk" data-person="dk">
+                도권 💙
+              </button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">내용 (메모)</label>
+            <input
+              type="text"
+              id="payMemo"
+              class="input-field"
+              placeholder="예: 용돈"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">받은 용돈 금액</label>
+            <input
+              type="number"
+              id="allowanceInput"
+              class="input-field"
+              placeholder="금액을 입력하세요"
+            />
+          </div>
+          <div class="result-box">
+            <div
+              style="
+                font-size: 0.8rem;
+                font-weight: 700;
+                color: #856404;
+                margin-bottom: 5px;
+              "
+            >
+              납부할 세금 (10%)
+            </div>
+            <div
+              style="font-size: 2rem; font-weight: 900; color: #e65100"
+              id="taxResult"
+            >
+              0원
+            </div>
+          </div>
+          <button class="btn-primary" id="recordTaxBtn">
+            세금 기록하기 🚀
+          </button>
+        </div>
+      </div>
+
+      <div id="duesTab" class="tab-content">
+        <div class="card">
+          <div class="form-group">
+            <label class="form-label">날짜</label>
+            <input type="date" id="duesDate" class="input-field" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">가족회비 납부</label>
+            <div
+              style="
+                background: #f1f5f9;
+                padding: 15px;
+                border-radius: 16px;
+                margin-bottom: 15px;
+              "
+            >
+              <div
+                style="
+                  display: flex;
+                  justify-content: space-between;
+                  margin-bottom: 8px;
+                "
+              >
                 <span>채원</span>
-              </button>
-              <button type="button" class="buyer-btn dk" id="btn-buyer-dk" data-buyer="dk">
-                <span class="icon">💙</span>
+                <span style="font-weight: 700">5,000원</span>
+              </div>
+              <div style="display: flex; justify-content: space-between">
                 <span>도권</span>
-              </button>
+                <span style="font-weight: 700">3,000원</span>
+              </div>
             </div>
           </div>
-        </div>
-        <div class="form-group">
-          <label class="checkbox-container" for="notReflectedCheckbox">
-            <input type="checkbox" id="notReflectedCheckbox">
-            <span>연말정산 미반영</span>
-          </label>
-        </div>
-        <button class="btn-primary" id="recordPurchaseBtn">세금 사용 기록 🎉</button>
-      </div>
-    </div>
-
-    <div id="approvalTab-content" class="tab-content">
-      <div class="card">
-        <div style="font-weight:800; margin-bottom:15px; display:flex; align-items:center; gap:8px;">
-          <span>⏳</span> 승인 대기 목록
-        </div>
-        <div id="approvalList">
-          <div class="empty-state">승인 대기 중인 항목이 없습니다</div>
+          <div class="form-group">
+            <label class="form-label">메모 (선택)</label>
+            <input
+              type="text"
+              id="duesMemo"
+              class="input-field"
+              placeholder="예: 12월 회비"
+            />
+          </div>
+          <button class="btn-primary" id="recordDuesBtn">
+            회비 납부 기록 💝
+          </button>
         </div>
       </div>
-    </div>
 
-    <div id="historyTab" class="tab-content">
-      <div class="card">
-        <div style="font-weight:800; margin-bottom:15px;">📋 연도별 내역</div>
-        <div class="year-selector">
-          <select id="yearDropdown" class="year-dropdown">
-            <option value="">연도 선택</option>
-          </select>
-          <div class="edit-mode-btns">
-            <button class="btn-edit" id="editModeBtn">수정</button>
-            <button class="btn-delete" id="deleteModeBtn">삭제</button>
+      <div id="familyTab" class="tab-content">
+        <div class="card">
+          <div class="form-group">
+            <label class="form-label">날짜</label>
+            <input type="date" id="purchaseDate" class="input-field" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">구매 금액</label>
+            <input
+              type="number"
+              id="purchaseAmount"
+              class="input-field"
+              placeholder="금액을 입력하세요"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">구매 내용</label>
+            <input
+              type="text"
+              id="purchaseDesc"
+              class="input-field"
+              placeholder="예: 영화 관람"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">구매자 선택 *</label>
+            <div class="buyer-select-wrapper" id="buyerSelectWrapper">
+              <div class="buyer-select">
+                <button
+                  type="button"
+                  class="buyer-btn together active"
+                  id="btn-together"
+                  data-buyer="together"
+                >
+                  <span class="icon">👨👩👧👦</span>
+                  <span>함께</span>
+                </button>
+                <button
+                  type="button"
+                  class="buyer-btn cw"
+                  id="btn-buyer-cw"
+                  data-buyer="cw"
+                >
+                  <span class="icon">💜</span>
+                  <span>채원</span>
+                </button>
+                <button
+                  type="button"
+                  class="buyer-btn dk"
+                  id="btn-buyer-dk"
+                  data-buyer="dk"
+                >
+                  <span class="icon">💙</span>
+                  <span>도권</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="checkbox-container" for="notReflectedCheckbox">
+              <input type="checkbox" id="notReflectedCheckbox" />
+              <span>연말정산 미반영</span>
+            </label>
+          </div>
+          <button class="btn-primary" id="recordPurchaseBtn">
+            세금 사용 기록 🎉
+          </button>
+        </div>
+      </div>
+
+      <div id="approvalTab-content" class="tab-content">
+        <div class="card">
+          <div
+            style="
+              font-weight: 800;
+              margin-bottom: 15px;
+              display: flex;
+              align-items: center;
+              gap: 8px;
+            "
+          >
+            <span>⏳</span> 승인 대기 목록
+          </div>
+          <div id="approvalList">
+            <div class="empty-state">승인 대기 중인 항목이 없습니다</div>
           </div>
         </div>
-        
-        <div class="record-header">
-          <div>날짜 (내역)</div>
-          <div>채원</div>
-          <div>도권</div>
-        </div>
-        
-        <div id="recordList">
-          <div class="empty-state">내역을 불러오는 중...</div>
+      </div>
+
+      <div id="historyTab" class="tab-content">
+        <div class="card">
+          <div style="font-weight: 800; margin-bottom: 15px">
+            📋 연도별 내역
+          </div>
+          <div class="year-selector">
+            <select id="yearDropdown" class="year-dropdown">
+              <option value="">연도 선택</option>
+            </select>
+            <div class="edit-mode-btns">
+              <button class="btn-edit" id="editModeBtn">수정</button>
+              <button class="btn-delete" id="deleteModeBtn">삭제</button>
+            </div>
+          </div>
+
+          <div class="record-header">
+            <div>날짜 (내역)</div>
+            <div>채원</div>
+            <div>도권</div>
+          </div>
+
+          <div id="recordList">
+            <div class="empty-state">내역을 불러오는 중...</div>
+          </div>
         </div>
       </div>
+
+      <div class="footer">©2025 L.To. ALL RIGHTS RESERVED. POWERED BY L.To</div>
     </div>
 
-    <div class="footer">
-      ©2025 L.To. ALL RIGHTS RESERVED. POWERED BY L.To
-    </div>
-  </div>
+    <script src="mock-gas.js"></script>
 
-  <script src="mock-gas.js"></script>
+    <script>
+      let currentPerson = "cw";
+      let currentYear = new Date().getFullYear();
+      let availableYears = [];
+      let editMode = false;
+      let deleteMode = false;
+      let currentRecords = [];
+      let currentBuyer = "together";
+      let userName = "";
+      let isParent = false;
+      let pendingApprovals = [];
+      let deferredPrompt;
 
-  <script>
-    let currentPerson = 'cw';
-    let currentYear = new Date().getFullYear();
-    let availableYears = [];
-    let editMode = false;
-    let deleteMode = false;
-    let currentRecords = [];
-    let currentBuyer = 'together';
-    let userName = '';
-    let isParent = false;
-    let pendingApprovals = [];
-    let deferredPrompt;
-    
-    // 이름 매핑 함수
-    function getDisplayName(name) {
-      if (name === 'cw') return '채원';
-      if (name === 'dk') return '도권';
-      if (name === 'admin' || name === 'parent' || name === '부모님') return '부모님';
-      return name;
-    }
-
-    // PWA Install Prompt Logic
-    window.addEventListener('beforeinstallprompt', (e) => {
-      // Prevent the mini-infobar from appearing on mobile
-      e.preventDefault();
-      // Stash the event so it can be triggered later.
-      deferredPrompt = e;
-      // Update UI notify the user they can install the PWA
-      const installBtn = document.getElementById('installAppBtn');
-      if (installBtn) {
-        installBtn.style.display = 'inline-flex';
+      // 이름 매핑 함수
+      function getDisplayName(name) {
+        if (name === "cw") return "채원";
+        if (name === "dk") return "도권";
+        if (name === "admin" || name === "parent" || name === "부모님")
+          return "부모님";
+        return name;
       }
-      console.log('Capture beforeinstallprompt event');
-    });
 
-    document.getElementById('installAppBtn')?.addEventListener('click', async () => {
-      if (!deferredPrompt) {
-        return;
-      }
-      // Show the install prompt
-      deferredPrompt.prompt();
-      // Wait for the user to respond to the prompt
-      const { outcome } = await deferredPrompt.userChoice;
-      console.log(`User response to the install prompt: ${outcome}`);
-      // We've used the prompt, and can't use it again, throw it away
-      deferredPrompt = null;
-      // Hide the button
-      document.getElementById('installAppBtn').style.display = 'none';
-    });
-
-    function initializeDateFields() {
-      const today = new Date().toISOString().split('T')[0];
-      document.getElementById('payDate').value = today;
-      document.getElementById('duesDate').value = today;
-      document.getElementById('purchaseDate').value = today;
-    }
-
-    function showLoading() {
-      document.getElementById('loading').classList.add('active');
-    }
-
-    function hideLoading() {
-      document.getElementById('loading').classList.remove('active');
-    }
-
-    function loadTaxData() {
-      console.log('데이터 로드 시작...');
-      
-      if (typeof google === 'undefined' || !google.script) {
-        console.error('Google Apps Script 환경이 아닙니다');
-        // mock-gas.js takes over if loaded, otherwise show alert
-        if (typeof google === 'undefined') {
-          alert('오류: Apps Script로 배포되지 않았습니다.');
+      // PWA Install Prompt Logic
+      window.addEventListener("beforeinstallprompt", (e) => {
+        // Prevent the mini-infobar from appearing on mobile
+        e.preventDefault();
+        // Stash the event so it can be triggered later.
+        deferredPrompt = e;
+        // Update UI notify the user they can install the PWA
+        const installBtn = document.getElementById("installAppBtn");
+        if (installBtn) {
+          installBtn.style.display = "inline-flex";
         }
-        return;
-      }
-      
-      google.script.run
-        .withSuccessHandler(function(data) {
-          console.log('데이터 로드 성공:', data);
-          
-          document.getElementById('cwTotal').textContent = data.cwTotal.toLocaleString() + '원';
-          document.getElementById('dkTotal').textContent = data.dkTotal.toLocaleString() + '원';
-          document.getElementById('totalTax').textContent = (data.cwTotal + data.dkTotal).toLocaleString() + '원';
-          document.getElementById('cwRefund').textContent = data.cwRefund.toLocaleString() + '원';
-          document.getElementById('dkRefund').textContent = data.dkRefund.toLocaleString() + '원';
-          
-          availableYears = data.availableYears || [data.year];
-          currentYear = data.year;
-          userName = data.userName || '';
-          isParent = data.isParent || false;
-          
-          const userInfoEl = document.getElementById('userInfo');
-          const displayUserName = getDisplayName(userName);
-          
-          if (isParent) {
-            userInfoEl.textContent = '👨👩👧👦 ' + displayUserName + ' (관리자)';
-            userInfoEl.classList.add('parent');
-            document.getElementById('approvalTab').style.display = 'block';
-            loadPendingApprovals();
-          } else {
-            userInfoEl.textContent = '👤 ' + displayUserName;
-            userInfoEl.classList.remove('parent');
-            document.getElementById('approvalTab').style.display = 'none';
-          }
-          
-          updateYearSelector();
-        })
-        .withFailureHandler(function(error) {
-          console.error('데이터 로드 실패:', error);
-          alert('데이터 로드 실패:\n' + error.message);
-        })
-        .getTaxData();
-    }
+        console.log("Capture beforeinstallprompt event");
+      });
 
-    function loadPendingApprovals() {
-      if (!isParent) return;
-      
-      google.script.run
-        .withSuccessHandler(function(result) {
-          if (result.success) {
-            pendingApprovals = result.list || [];
-            displayPendingApprovals();
-            
-            const badge = document.getElementById('approvalBadge');
-            if (pendingApprovals.length > 0) {
-              badge.textContent = pendingApprovals.length;
-              badge.style.display = 'block';
+      document
+        .getElementById("installAppBtn")
+        ?.addEventListener("click", async () => {
+          if (!deferredPrompt) {
+            return;
+          }
+          // Show the install prompt
+          deferredPrompt.prompt();
+          // Wait for the user to respond to the prompt
+          const { outcome } = await deferredPrompt.userChoice;
+          console.log(`User response to the install prompt: ${outcome}`);
+          // We've used the prompt, and can't use it again, throw it away
+          deferredPrompt = null;
+          // Hide the button
+          document.getElementById("installAppBtn").style.display = "none";
+        });
+
+      function initializeDateFields() {
+        const today = new Date().toISOString().split("T")[0];
+        document.getElementById("payDate").value = today;
+        document.getElementById("duesDate").value = today;
+        document.getElementById("purchaseDate").value = today;
+      }
+
+      function showLoading() {
+        document.getElementById("loading").classList.add("active");
+      }
+
+      function hideLoading() {
+        document.getElementById("loading").classList.remove("active");
+      }
+
+      function loadTaxData() {
+        console.log("데이터 로드 시작...");
+
+        if (typeof google === "undefined" || !google.script) {
+          console.error("Google Apps Script 환경이 아닙니다");
+          // mock-gas.js takes over if loaded, otherwise show alert
+          if (typeof google === "undefined") {
+            alert("오류: Apps Script로 배포되지 않았습니다.");
+          }
+          return;
+        }
+
+        google.script.run
+          .withSuccessHandler(function (data) {
+            console.log("데이터 로드 성공:", data);
+
+            document.getElementById("cwTotal").textContent =
+              data.cwTotal.toLocaleString() + "원";
+            document.getElementById("dkTotal").textContent =
+              data.dkTotal.toLocaleString() + "원";
+            document.getElementById("totalTax").textContent =
+              (data.cwTotal + data.dkTotal).toLocaleString() + "원";
+            document.getElementById("cwRefund").textContent =
+              data.cwRefund.toLocaleString() + "원";
+            document.getElementById("dkRefund").textContent =
+              data.dkRefund.toLocaleString() + "원";
+
+            availableYears = data.availableYears || [data.year];
+            currentYear = data.year;
+            userName = data.userName || "";
+            isParent = data.isParent || false;
+
+            const userInfoEl = document.getElementById("userInfo");
+            const displayUserName = getDisplayName(userName);
+
+            if (isParent) {
+              userInfoEl.textContent =
+                "👨👩👧👦 " + displayUserName + " (관리자)";
+              userInfoEl.classList.add("parent");
+              document.getElementById("approvalTab").style.display = "block";
+              loadPendingApprovals();
             } else {
-              badge.style.display = 'none';
+              userInfoEl.textContent = "👤 " + displayUserName;
+              userInfoEl.classList.remove("parent");
+              document.getElementById("approvalTab").style.display = "none";
             }
-          }
-        })
-        .withFailureHandler(function(error) {
-          console.error('승인 대기 목록 로드 실패:', error);
-        })
-        .getPendingApprovals();
-    }
 
-    function displayPendingApprovals() {
-      const listEl = document.getElementById('approvalList');
-      
-      if (pendingApprovals.length === 0) {
-        listEl.innerHTML = '<div class="empty-state">승인 대기 중인 항목이 없습니다</div>';
-        return;
+            updateYearSelector();
+          })
+          .withFailureHandler(function (error) {
+            console.error("데이터 로드 실패:", error);
+            alert("데이터 로드 실패:\n" + error.message);
+          })
+          .getTaxData();
       }
-      
-      listEl.innerHTML = pendingApprovals.map((item, index) => {
-        const displayRequester = getDisplayName(item.requester);
-        return '<div class="approval-item">' +
-          '<div class="approval-header">' +
-            '<div class="approval-type">📋 ' + item.actionType + '</div>' +
-            '<div class="approval-time">' + item.requestTime + '</div>' +
-          '</div>' +
-          '<div style="margin-bottom:10px; color:#64748b; font-size:0.85rem;">신청자: ' + displayRequester + '</div>' +
-          '<div class="approval-details">' +
-            '<div class="approval-detail">' +
+
+      function loadPendingApprovals() {
+        if (!isParent) return;
+
+        google.script.run
+          .withSuccessHandler(function (result) {
+            if (result.success) {
+              pendingApprovals = result.list || [];
+              displayPendingApprovals();
+
+              const badge = document.getElementById("approvalBadge");
+              if (pendingApprovals.length > 0) {
+                badge.textContent = pendingApprovals.length;
+                badge.style.display = "block";
+              } else {
+                badge.style.display = "none";
+              }
+            }
+          })
+          .withFailureHandler(function (error) {
+            console.error("승인 대기 목록 로드 실패:", error);
+          })
+          .getPendingApprovals();
+      }
+
+      function displayPendingApprovals() {
+        const listEl = document.getElementById("approvalList");
+
+        if (pendingApprovals.length === 0) {
+          listEl.innerHTML =
+            '<div class="empty-state">승인 대기 중인 항목이 없습니다</div>';
+          return;
+        }
+
+        listEl.innerHTML = pendingApprovals
+          .map((item, index) => {
+            const displayRequester = getDisplayName(item.requester);
+            return (
+              '<div class="approval-item">' +
+              '<div class="approval-header">' +
+              '<div class="approval-type">📋 ' +
+              item.actionType +
+              "</div>" +
+              '<div class="approval-time">' +
+              item.requestTime +
+              "</div>" +
+              "</div>" +
+              '<div style="margin-bottom:10px; color:#64748b; font-size:0.85rem;">신청자: ' +
+              displayRequester +
+              "</div>" +
+              '<div class="approval-details">' +
+              '<div class="approval-detail">' +
               '<div class="approval-detail-label">채원</div>' +
-              '<div class="approval-detail-value" style="color:#9333ea;">' + item.cw.toLocaleString() + '원</div>' +
-            '</div>' +
-            '<div class="approval-detail">' +
+              '<div class="approval-detail-value" style="color:#9333ea;">' +
+              item.cw.toLocaleString() +
+              "원</div>" +
+              "</div>" +
+              '<div class="approval-detail">' +
               '<div class="approval-detail-label">도권</div>' +
-              '<div class="approval-detail-value" style="color:#4f46e5;">' + item.dk.toLocaleString() + '원</div>' +
-            '</div>' +
-          '</div>' +
-          '<div style="background:#f8fafc; padding:10px; border-radius:10px; margin-bottom:10px;">' +
-            '<div class="approval-detail-label">상세 내용</div>' +
-            '<div style="font-size:0.9rem; white-space:pre-wrap;">' + item.details + '</div>' +
-          '</div>' +
-          '<div class="approval-buttons">' +
-            '<button class="btn-approve" onclick="approveRequest(' + index + ')">승인</button>' +
-            '<button class="btn-reject" onclick="rejectRequest(' + index + ')">거부</button>' +
-          '</div>' +
-        '</div>';
-      }).join('');
-    }
-
-    function approveRequest(index) {
-      if (!confirm('이 요청을 승인하시겠습니까?')) return;
-      
-      const item = pendingApprovals[index];
-      showLoading();
-      
-      google.script.run
-        .withSuccessHandler(function(result) {
-          hideLoading();
-          if (result.success) {
-            alert('승인되었습니다!');
-            loadPendingApprovals();
-            loadTaxData(); // 갱신된 데이터 로드
-          } else {
-            alert('승인 실패: ' + result.message);
-          }
-        })
-        .withFailureHandler(function(error) {
-          hideLoading();
-          alert('승인 실패: ' + error);
-        })
-        .approveRequest(item.row, item.actionType, item.details);
-    }
-    
-    function rejectRequest(index) {
-      const reason = prompt('거부 사유를 입력해주세요 (선택사항):');
-      if (reason === null) return; // 취소
-      
-      const item = pendingApprovals[index];
-      showLoading();
-      
-      google.script.run
-        .withSuccessHandler(function(result) {
-          hideLoading();
-          if (result.success) {
-            alert('거부되었습니다.');
-            loadPendingApprovals();
-          } else {
-            alert('거부 실패: ' + result.message);
-          }
-        })
-        .withFailureHandler(function(error) {
-          hideLoading();
-          alert('거부 실패: ' + error);
-        })
-        .rejectRequest(item.row, item.actionType, reason);
-    }
-
-    function updateYearSelector() {
-      const select = document.getElementById('yearDropdown');
-      select.innerHTML = '';
-      
-      availableYears.forEach(year => {
-        const option = document.createElement('option');
-        option.value = year;
-        option.textContent = year + '년';
-        if (year == currentYear) option.selected = true;
-        select.appendChild(option);
-      });
-      
-      loadYearHistory(currentYear);
-    }
-
-    document.getElementById('yearDropdown').addEventListener('change', function() {
-      currentYear = this.value;
-      loadYearHistory(currentYear);
-    });
-
-    function loadYearHistory(year) {
-      document.getElementById('recordList').innerHTML = '<div class="empty-state">내역을 불러오는 중...</div>';
-      
-      google.script.run
-        .withSuccessHandler(function(records) {
-          currentRecords = records;
-          displayRecords(records);
-        })
-        .withFailureHandler(function(error) {
-          console.error('내역 로드 실패:', error);
-          document.getElementById('recordList').innerHTML = '<div class="empty-state">내역을 불러오지 못했습니다</div>';
-        })
-        .getYearData(year);
-    }
-
-    function displayRecords(records) {
-      const listEl = document.getElementById('recordList');
-      
-      if (!records || records.length === 0) {
-        listEl.innerHTML = '<div class="empty-state">' + currentYear + '년 내역이 없습니다</div>';
-        return;
+              '<div class="approval-detail-value" style="color:#4f46e5;">' +
+              item.dk.toLocaleString() +
+              "원</div>" +
+              "</div>" +
+              "</div>" +
+              '<div style="background:#f8fafc; padding:10px; border-radius:10px; margin-bottom:10px;">' +
+              '<div class="approval-detail-label">상세 내용</div>' +
+              '<div style="font-size:0.9rem; white-space:pre-wrap;">' +
+              item.details +
+              "</div>" +
+              "</div>" +
+              '<div class="approval-buttons">' +
+              '<button class="btn-approve" onclick="approveRequest(' +
+              index +
+              ')">승인</button>' +
+              '<button class="btn-reject" onclick="rejectRequest(' +
+              index +
+              ')">거부</button>' +
+              "</div>" +
+              "</div>"
+            );
+          })
+          .join("");
       }
-      
-      listEl.innerHTML = records.map((record, index) => {
-        const isEditing = editMode;
-        
-        let html = '<div class="record-item ' + (isEditing ? 'editing' : '') + '">';
-        
-        // 날짜 및 정보
-        html += '<div class="record-info">';
-        html += '<div class="record-date">' + record.date + '</div>';
-        html += '<div class="record-memo">' + record.memo + '</div>';
-        html += '</div>';
-        
-        // 금액 (cw)
-        html += '<div class="record-amount cw">';
-        if (record.cw !== 0) {
-          html += record.cw.toLocaleString();
-        } else {
-          html += '-';
-        }
-        html += '</div>';
-        
-        // 금액 (dk)
-        html += '<div class="record-amount dk">';
-        if (record.dk !== 0) {
-          html += record.dk.toLocaleString();
-        } else {
-          html += '-';
-        }
-        html += '</div>';
-        
-        // 액션 버튼
-        if (isEditing) {
-          html += '<div class="record-actions">';
-          html += '<button class="btn-icon edit" onclick="editRecord(' + index + ')" title="수정">✏️</button>';
-          html += '</div>';
-        } else if (deleteMode) {
-          html += '<div class="record-actions">';
-          html += '<button class="btn-icon delete" onclick="deleteRecord(' + index + ')" title="삭제">🗑️</button>';
-          html += '</div>';
-        } else {
-           html += '<div></div>'; // placeholder
-        }
-        
-        html += '</div>';
-        return html;
-      }).join('');
-      
-      updateButtonVisibility();
-    }
-    
-    function updateButtonVisibility() {
-      // 수정/삭제 모드일 때 버튼 상태 업데이트 UI 로직이 필요하다면 여기에 추가
-    }
 
-    function editRecord(index) {
-      const record = currentRecords[index];
-      const newMemo = prompt('새로운 내역(메모)을 입력하세요:', record.memo);
-      if (newMemo === null) return;
-      
-      const newCw = prompt('cw 금액 수정:', record.cw);
-      if (newCw === null) return;
-      
-      const newDk = prompt('dk 금액 수정:', record.dk);
-      if (newDk === null) return;
-      
-      showLoading();
-      google.script.run
-        .withSuccessHandler(function(result) {
-          hideLoading();
-          if (result.success) {
-            alert('수정되었습니다!');
-            loadYearHistory(currentYear);
-            loadTaxData();
-          } else {
-            alert('수정 실패: ' + result.message);
-          }
-        })
-        .withFailureHandler(function(error) {
-          hideLoading();
-          alert('수정 실패: ' + error);
-        })
-        .updateRecord(currentYear, record.rowIndex, newCw, newDk, newMemo);
-    }
+      function approveRequest(index) {
+        if (!confirm("이 요청을 승인하시겠습니까?")) return;
 
-    function deleteRecord(index) {
-      const record = currentRecords[index];
-      if (!confirm('이 내역을 삭제하시겠습니까?\n날짜: ' + record.date + '\n내용: ' + record.memo)) return;
-      
-      showLoading();
-      google.script.run
-        .withSuccessHandler(function(result) {
-          hideLoading();
-          if (result.success) {
-            alert('삭제되었습니다!');
-            loadYearHistory(currentYear);
-            loadTaxData();
-          } else {
-            alert('삭제 실패: ' + result.message);
-          }
-        })
-        .withFailureHandler(function(error) {
-          hideLoading();
-          alert('삭제 실패: ' + error);
-        })
-        .deleteRecord(currentYear, record.rowIndex);
-    }
+        const item = pendingApprovals[index];
+        showLoading();
 
-    document.getElementById('editModeBtn').addEventListener('click', function() {
-      editMode = !editMode;
-      if (editMode) {
-        deleteMode = false;
-        this.textContent = '수정 취소';
-        document.getElementById('deleteModeBtn').textContent = '삭제';
-      } else {
-        this.textContent = '수정';
+        google.script.run
+          .withSuccessHandler(function (result) {
+            hideLoading();
+            if (result.success) {
+              alert("승인되었습니다!");
+              loadPendingApprovals();
+              loadTaxData(); // 갱신된 데이터 로드
+            } else {
+              alert("승인 실패: " + result.message);
+            }
+          })
+          .withFailureHandler(function (error) {
+            hideLoading();
+            alert("승인 실패: " + error);
+          })
+          .approveRequest(item.rowIndex, item.actionType, item.details);
       }
-      loadYearHistory(currentYear); // 리스트 갱신하여 버튼 표시
-    });
 
-    document.getElementById('deleteModeBtn').addEventListener('click', function() {
-      deleteMode = !deleteMode;
-      if (deleteMode) {
-        editMode = false;
-        this.textContent = '삭제 취소';
-        document.getElementById('editModeBtn').textContent = '수정';
-      } else {
-        this.textContent = '삭제';
+      function rejectRequest(index) {
+        const reason = prompt("거부 사유를 입력해주세요 (선택사항):");
+        if (reason === null) return; // 취소
+
+        const item = pendingApprovals[index];
+        showLoading();
+
+        google.script.run
+          .withSuccessHandler(function (result) {
+            hideLoading();
+            if (result.success) {
+              alert("거부되었습니다.");
+              loadPendingApprovals();
+            } else {
+              alert("거부 실패: " + result.message);
+            }
+          })
+          .withFailureHandler(function (error) {
+            hideLoading();
+            alert("거부 실패: " + error);
+          })
+          .rejectRequest(item.rowIndex, item.actionType, reason);
       }
-      loadYearHistory(currentYear); // 리스트 갱신하여 버튼 표시
-    });
 
-    document.querySelectorAll('.tab').forEach(tab => {
-      tab.addEventListener('click', function() {
-        const tabName = this.dataset.tab;
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        this.classList.add('active');
-        
-        if (tabName === 'approval') {
-          document.getElementById('approvalTab-content').classList.add('active');
-          loadPendingApprovals();
-        } else if (tabName === 'history') {
-          document.getElementById(tabName + 'Tab').classList.add('active');
+      function updateYearSelector() {
+        const select = document.getElementById("yearDropdown");
+        select.innerHTML = "";
+
+        availableYears.forEach((year) => {
+          const option = document.createElement("option");
+          option.value = year;
+          option.textContent = year + "년";
+          if (year == currentYear) option.selected = true;
+          select.appendChild(option);
+        });
+
+        loadYearHistory(currentYear);
+      }
+
+      document
+        .getElementById("yearDropdown")
+        .addEventListener("change", function () {
+          currentYear = this.value;
           loadYearHistory(currentYear);
-        } else {
-          document.getElementById(tabName + 'Tab').classList.add('active');
+        });
+
+      function loadYearHistory(year) {
+        document.getElementById("recordList").innerHTML =
+          '<div class="empty-state">내역을 불러오는 중...</div>';
+
+        google.script.run
+          .withSuccessHandler(function (records) {
+            currentRecords = records;
+            displayRecords(records);
+          })
+          .withFailureHandler(function (error) {
+            console.error("내역 로드 실패:", error);
+            document.getElementById("recordList").innerHTML =
+              '<div class="empty-state">내역을 불러오지 못했습니다</div>';
+          })
+          .getYearData(year);
+      }
+
+      function displayRecords(records) {
+        const listEl = document.getElementById("recordList");
+
+        if (!records || records.length === 0) {
+          listEl.innerHTML =
+            '<div class="empty-state">' +
+            currentYear +
+            "년 내역이 없습니다</div>";
+          return;
         }
-      });
-    });
 
-    document.querySelectorAll('.person-btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        currentPerson = this.dataset.person;
-        document.querySelectorAll('.person-btn').forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-      });
-    });
+        listEl.innerHTML = records
+          .map((record, index) => {
+            const isEditing = editMode;
 
-    document.getElementById('allowanceInput').addEventListener('input', function() {
-      const amount = parseInt(this.value) || 0;
-      const tax = Math.floor(amount * 0.1 / 100) * 100;
-      document.getElementById('taxResult').textContent = tax.toLocaleString() + '원';
-    });
+            let html =
+              '<div class="record-item ' + (isEditing ? "editing" : "") + '">';
 
-    document.getElementById('recordTaxBtn').addEventListener('click', function() {
-      const allowance = parseInt(document.getElementById('allowanceInput').value);
-      const memo = document.getElementById('payMemo').value || '용돈';
-      const dateStr = document.getElementById('payDate').value;
-      
-      if (!allowance || allowance <= 0) {
-        alert('용돈 금액을 입력하세요.');
-        return;
+            // 날짜 및 정보
+            html += '<div class="record-info">';
+            html += '<div class="record-date">' + record.date + "</div>";
+            html += '<div class="record-memo">' + record.memo + "</div>";
+            html += "</div>";
+
+            // 금액 (cw)
+            html += '<div class="record-amount cw">';
+            if (record.cw !== 0) {
+              html += record.cw.toLocaleString();
+            } else {
+              html += "-";
+            }
+            html += "</div>";
+
+            // 금액 (dk)
+            html += '<div class="record-amount dk">';
+            if (record.dk !== 0) {
+              html += record.dk.toLocaleString();
+            } else {
+              html += "-";
+            }
+            html += "</div>";
+
+            // 액션 버튼
+            if (isEditing) {
+              html += '<div class="record-actions">';
+              html +=
+                '<button class="btn-icon edit" onclick="editRecord(' +
+                index +
+                ')" title="수정">✏️</button>';
+              html += "</div>";
+            } else if (deleteMode) {
+              html += '<div class="record-actions">';
+              html +=
+                '<button class="btn-icon delete" onclick="deleteRecord(' +
+                index +
+                ')" title="삭제">🗑️</button>';
+              html += "</div>";
+            } else {
+              html += "<div></div>"; // placeholder
+            }
+
+            html += "</div>";
+            return html;
+          })
+          .join("");
+
+        updateButtonVisibility();
       }
-      
-      showLoading();
-      google.script.run
-        .withSuccessHandler(function(result) {
-          hideLoading();
-          if (result.needsApproval) {
-            alert('승인 요청이 완료되었습니다!\n부모님 승인 후 기록됩니다.\n세금: ' + result.tax.toLocaleString() + '원');
+
+      function updateButtonVisibility() {
+        // 수정/삭제 모드일 때 버튼 상태 업데이트 UI 로직이 필요하다면 여기에 추가
+      }
+
+      function editRecord(index) {
+        const record = currentRecords[index];
+        const newMemo = prompt("새로운 내역(메모)을 입력하세요:", record.memo);
+        if (newMemo === null) return;
+
+        const newCw = prompt("cw 금액 수정:", record.cw);
+        if (newCw === null) return;
+
+        const newDk = prompt("dk 금액 수정:", record.dk);
+        if (newDk === null) return;
+
+        showLoading();
+        google.script.run
+          .withSuccessHandler(function (result) {
+            hideLoading();
+            if (result.success) {
+              alert("수정되었습니다!");
+              loadYearHistory(currentYear);
+              loadTaxData();
+            } else {
+              alert("수정 실패: " + result.message);
+            }
+          })
+          .withFailureHandler(function (error) {
+            hideLoading();
+            alert("수정 실패: " + error);
+          })
+          .updateRecord(currentYear, record.rowIndex, newCw, newDk, newMemo);
+      }
+
+      function deleteRecord(index) {
+        const record = currentRecords[index];
+        if (
+          !confirm(
+            "이 내역을 삭제하시겠습니까?\n날짜: " +
+              record.date +
+              "\n내용: " +
+              record.memo,
+          )
+        )
+          return;
+
+        showLoading();
+        google.script.run
+          .withSuccessHandler(function (result) {
+            hideLoading();
+            if (result.success) {
+              alert("삭제되었습니다!");
+              loadYearHistory(currentYear);
+              loadTaxData();
+            } else {
+              alert("삭제 실패: " + result.message);
+            }
+          })
+          .withFailureHandler(function (error) {
+            hideLoading();
+            alert("삭제 실패: " + error);
+          })
+          .deleteRecord(currentYear, record.rowIndex);
+      }
+
+      document
+        .getElementById("editModeBtn")
+        .addEventListener("click", function () {
+          editMode = !editMode;
+          if (editMode) {
+            deleteMode = false;
+            this.textContent = "수정 취소";
+            document.getElementById("deleteModeBtn").textContent = "삭제";
           } else {
-            alert(result.tax.toLocaleString() + '원이 기록되었습니다!');
+            this.textContent = "수정";
           }
-          document.getElementById('allowanceInput').value = '';
-          document.getElementById('payMemo').value = '';
-          document.getElementById('taxResult').textContent = '0원';
-          initializeDateFields();
-          loadTaxData();
-        })
-        .withFailureHandler(function(error) {
-          hideLoading();
-          alert('실패: ' + error);
-        })
-        .requestTax(currentPerson, allowance, memo, dateStr);
-    });
+          loadYearHistory(currentYear); // 리스트 갱신하여 버튼 표시
+        });
 
-    document.getElementById('recordDuesBtn').addEventListener('click', function() {
-      const memo = document.getElementById('duesMemo').value || '가족회비';
-      const dateStr = document.getElementById('duesDate').value;
-      
-      if (!confirm('회비를 납부하시겠습니까?\n채원: 5,000원\n도권: 3,000원')) return;
-      
-      showLoading();
-      google.script.run
-        .withSuccessHandler(function(result) {
-          hideLoading();
-          if (result.needsApproval) {
-            alert('승인 요청이 완료되었습니다!\n부모님 승인 후 기록됩니다.');
+      document
+        .getElementById("deleteModeBtn")
+        .addEventListener("click", function () {
+          deleteMode = !deleteMode;
+          if (deleteMode) {
+            editMode = false;
+            this.textContent = "삭제 취소";
+            document.getElementById("editModeBtn").textContent = "수정";
           } else {
-            alert('회비가 납부되었습니다!');
+            this.textContent = "삭제";
           }
-          document.getElementById('duesMemo').value = '';
-          initializeDateFields();
-          loadTaxData();
-        })
-        .withFailureHandler(function(error) {
-          hideLoading();
-          alert('실패: ' + error);
-        })
-        .requestDues(dateStr, memo);
-    });
+          loadYearHistory(currentYear); // 리스트 갱신하여 버튼 표시
+        });
 
-    document.querySelectorAll('.buyer-btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        currentBuyer = this.dataset.buyer;
-        document.querySelectorAll('.buyer-btn').forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-        document.getElementById('buyerSelectWrapper').classList.remove('required');
+      document.querySelectorAll(".tab").forEach((tab) => {
+        tab.addEventListener("click", function () {
+          const tabName = this.dataset.tab;
+          document
+            .querySelectorAll(".tab")
+            .forEach((t) => t.classList.remove("active"));
+          document
+            .querySelectorAll(".tab-content")
+            .forEach((c) => c.classList.remove("active"));
+          this.classList.add("active");
+
+          if (tabName === "approval") {
+            document
+              .getElementById("approvalTab-content")
+              .classList.add("active");
+            loadPendingApprovals();
+          } else if (tabName === "history") {
+            document.getElementById(tabName + "Tab").classList.add("active");
+            loadYearHistory(currentYear);
+          } else {
+            document.getElementById(tabName + "Tab").classList.add("active");
+          }
+        });
       });
-    });
 
-    document.getElementById('recordPurchaseBtn').addEventListener('click', function() {
-      const amount = parseInt(document.getElementById('purchaseAmount').value);
-      let desc = document.getElementById('purchaseDesc').value;
-      const dateStr = document.getElementById('purchaseDate').value;
-      const notReflected = document.getElementById('notReflectedCheckbox').checked;
-      
-      if (!amount || amount <= 0) {
-        alert('금액을 입력하세요.');
-        return;
-      }
-      
-      if (!desc) {
-        alert('구매 내용을 입력하세요.');
-        return;
-      }
+      document.querySelectorAll(".person-btn").forEach((btn) => {
+        btn.addEventListener("click", function () {
+          currentPerson = this.dataset.person;
+          document
+            .querySelectorAll(".person-btn")
+            .forEach((b) => b.classList.remove("active"));
+          this.classList.add("active");
+        });
+      });
 
-      if (!currentBuyer) {
-        alert('구매자를 선택하세요.');
-        document.getElementById('buyerSelectWrapper').classList.add('required');
-        return;
-      }
+      document
+        .getElementById("allowanceInput")
+        .addEventListener("input", function () {
+          const amount = parseInt(this.value) || 0;
+          const tax = Math.floor((amount * 0.1) / 100) * 100;
+          document.getElementById("taxResult").textContent =
+            tax.toLocaleString() + "원";
+        });
 
-      if (notReflected) {
-        desc = desc + ' (연말정산 미반영)';
-      }
+      document
+        .getElementById("recordTaxBtn")
+        .addEventListener("click", function () {
+          const allowance = parseInt(
+            document.getElementById("allowanceInput").value,
+          );
+          const memo = document.getElementById("payMemo").value || "용돈";
+          const dateStr = document.getElementById("payDate").value;
 
-      let cwAmount, dkAmount;
-      
-      if (currentBuyer === 'together') {
-        cwAmount = amount / 2;
-        dkAmount = amount / 2;
-      } else if (currentBuyer === 'cw') {
-        cwAmount = amount;
-        dkAmount = 0;
-      } else if (currentBuyer === 'dk') {
-        cwAmount = 0;
-        dkAmount = amount;
-      }
-      
-      showLoading();
-      google.script.run
-        .withSuccessHandler(function(result) {
-          hideLoading();
-          if (result.needsApproval) {
-            alert('승인 요청이 완료되었습니다!\n부모님 승인 후 기록됩니다.');
-          } else {
-            alert('기록되었습니다!\n채원: ' + Math.abs(result.cw).toLocaleString() + '원\n도권: ' + Math.abs(result.dk).toLocaleString() + '원');
+          if (!allowance || allowance <= 0) {
+            alert("용돈 금액을 입력하세요.");
+            return;
           }
-          document.getElementById('purchaseAmount').value = '';
-          document.getElementById('purchaseDesc').value = '';
-          document.getElementById('notReflectedCheckbox').checked = false;
-          initializeDateFields();
-          loadTaxData();
-        })
-        .withFailureHandler(function(error) {
-          hideLoading();
-          alert('실패: ' + error);
-        })
-        .requestPurchase(cwAmount, dkAmount, desc, dateStr);
-    });
 
-    window.onload = function() {
-      console.log('페이지 로드 완료');
-      initializeDateFields();
-      loadTaxData();
-    };
-  </script>
-</body>
+          showLoading();
+          google.script.run
+            .withSuccessHandler(function (result) {
+              hideLoading();
+              if (result.needsApproval) {
+                alert(
+                  "승인 요청이 완료되었습니다!\n부모님 승인 후 기록됩니다.\n세금: " +
+                    result.tax.toLocaleString() +
+                    "원",
+                );
+              } else {
+                alert(result.tax.toLocaleString() + "원이 기록되었습니다!");
+              }
+              document.getElementById("allowanceInput").value = "";
+              document.getElementById("payMemo").value = "";
+              document.getElementById("taxResult").textContent = "0원";
+              initializeDateFields();
+              loadTaxData();
+            })
+            .withFailureHandler(function (error) {
+              hideLoading();
+              alert("실패: " + error);
+            })
+            .requestTax(currentPerson, allowance, memo, dateStr);
+        });
+
+      document
+        .getElementById("recordDuesBtn")
+        .addEventListener("click", function () {
+          const memo = document.getElementById("duesMemo").value || "가족회비";
+          const dateStr = document.getElementById("duesDate").value;
+
+          if (
+            !confirm("회비를 납부하시겠습니까?\n채원: 5,000원\n도권: 3,000원")
+          )
+            return;
+
+          showLoading();
+          google.script.run
+            .withSuccessHandler(function (result) {
+              hideLoading();
+              if (result.needsApproval) {
+                alert(
+                  "승인 요청이 완료되었습니다!\n부모님 승인 후 기록됩니다.",
+                );
+              } else {
+                alert("회비가 납부되었습니다!");
+              }
+              document.getElementById("duesMemo").value = "";
+              initializeDateFields();
+              loadTaxData();
+            })
+            .withFailureHandler(function (error) {
+              hideLoading();
+              alert("실패: " + error);
+            })
+            .requestDues(dateStr, memo);
+        });
+
+      document.querySelectorAll(".buyer-btn").forEach((btn) => {
+        btn.addEventListener("click", function () {
+          currentBuyer = this.dataset.buyer;
+          document
+            .querySelectorAll(".buyer-btn")
+            .forEach((b) => b.classList.remove("active"));
+          this.classList.add("active");
+          document
+            .getElementById("buyerSelectWrapper")
+            .classList.remove("required");
+        });
+      });
+
+      document
+        .getElementById("recordPurchaseBtn")
+        .addEventListener("click", function () {
+          const amount = parseInt(
+            document.getElementById("purchaseAmount").value,
+          );
+          let desc = document.getElementById("purchaseDesc").value;
+          const dateStr = document.getElementById("purchaseDate").value;
+          const notReflected = document.getElementById(
+            "notReflectedCheckbox",
+          ).checked;
+
+          if (!amount || amount <= 0) {
+            alert("금액을 입력하세요.");
+            return;
+          }
+
+          if (!desc) {
+            alert("구매 내용을 입력하세요.");
+            return;
+          }
+
+          if (!currentBuyer) {
+            alert("구매자를 선택하세요.");
+            document
+              .getElementById("buyerSelectWrapper")
+              .classList.add("required");
+            return;
+          }
+
+          if (notReflected) {
+            desc = desc + " (연말정산 미반영)";
+          }
+
+          let cwAmount, dkAmount;
+
+          if (currentBuyer === "together") {
+            cwAmount = amount / 2;
+            dkAmount = amount / 2;
+          } else if (currentBuyer === "cw") {
+            cwAmount = amount;
+            dkAmount = 0;
+          } else if (currentBuyer === "dk") {
+            cwAmount = 0;
+            dkAmount = amount;
+          }
+
+          showLoading();
+          google.script.run
+            .withSuccessHandler(function (result) {
+              hideLoading();
+              if (result.needsApproval) {
+                alert(
+                  "승인 요청이 완료되었습니다!\n부모님 승인 후 기록됩니다.",
+                );
+              } else {
+                alert(
+                  "기록되었습니다!\n채원: " +
+                    Math.abs(result.cw).toLocaleString() +
+                    "원\n도권: " +
+                    Math.abs(result.dk).toLocaleString() +
+                    "원",
+                );
+              }
+              document.getElementById("purchaseAmount").value = "";
+              document.getElementById("purchaseDesc").value = "";
+              document.getElementById("notReflectedCheckbox").checked = false;
+              initializeDateFields();
+              loadTaxData();
+            })
+            .withFailureHandler(function (error) {
+              hideLoading();
+              alert("실패: " + error);
+            })
+            .requestPurchase(cwAmount, dkAmount, desc, dateStr);
+        });
+
+      window.onload = function () {
+        console.log("페이지 로드 완료");
+        initializeDateFields();
+        loadTaxData();
+      };
+    </script>
+  </body>
 </html>
