@@ -1,0 +1,272 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="0dp">
+
+    <!-- Background (80% Alpha for Glassmorphism) -->
+    <ImageView
+        android:id="@+id/widget_bg"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/widget_glass_background"
+        android:scaleType="fitXY"
+        android:alpha="0.8" />
+
+    <!-- 5th Row: Last Updated (Fixed at Bottom) -->
+    <TextView
+        android:id="@+id/txt_last_updated"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:gravity="end"
+        android:paddingEnd="14dp"
+        android:paddingBottom="4dp"
+        android:text="최종 확인: --:--"
+        android:textColor="#80FFFFFF"
+        android:textSize="8sp" />
+
+    <!-- Login Required Mask -->
+    <LinearLayout
+        android:id="@+id/txt_login_required"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingHorizontal="14dp"
+        android:paddingTop="8dp"
+        android:visibility="visible">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_widget_logo"
+            android:layout_marginEnd="6dp"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="로그인이 필요합니다."
+            android:textColor="#FFFFFF"
+            android:textSize="12sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- Main Content Container -->
+    <LinearLayout
+        android:id="@+id/layout_data_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/txt_last_updated"
+        android:orientation="vertical"
+        android:gravity="top"
+        android:paddingHorizontal="14dp"
+        android:paddingTop="8dp"
+        android:visibility="gone">
+
+        <!-- 1st Row: Logo, Title, Badge -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="4dp">
+
+            <ImageView
+                android:id="@+id/img_logo"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_widget_logo"
+                android:scaleType="fitCenter"
+                android:layout_centerVertical="true" />
+
+            <TextView
+                android:id="@+id/txt_widget_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toEndOf="@id/img_logo"
+                android:layout_marginStart="6dp"
+                android:text="우리집 세금"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:layout_centerVertical="true" />
+
+            <!-- Pending Badge -->
+            <LinearLayout
+                android:id="@+id/layout_badge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:background="@drawable/badge_background"
+                android:gravity="center"
+                android:paddingHorizontal="6dp"
+                android:paddingVertical="2dp"
+                android:visibility="visible">
+
+                <TextView
+                    android:id="@+id/txt_badge_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="승인대기"
+                    android:textColor="#FFFFFF"
+                    android:textSize="9sp"
+                    android:layout_marginEnd="3dp" />
+
+                <TextView
+                    android:id="@+id/txt_pending_count"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0"
+                    android:textColor="#FFFFFF"
+                    android:textSize="9sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </RelativeLayout>
+
+        <!-- Container for 2nd, 3rd, 4th Rows -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:baselineAligned="false">
+
+            <!-- Left Info (채원) -->
+            <LinearLayout
+                android:id="@+id/layout_left"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <!-- 2nd Row: Name -->
+                <TextView
+                    android:id="@+id/txt_left_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="채원"
+                    android:textColor="#B3FFFFFF"
+                    android:textSize="12sp" />
+
+                <!-- 🏥 Vertical Layout (For Parent View) -->
+                <LinearLayout
+                    android:id="@+id/layout_left_vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="visible">
+                    <TextView
+                        android:id="@+id/txt_left_amount_v"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="₩ 0"
+                        android:textColor="#FFFFFF"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/txt_left_refund_v"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="환급액: ₩ 0"
+                        android:textColor="#CCFFFFFF"
+                        android:textSize="10sp" />
+                </LinearLayout>
+
+                <!-- 🏥 Horizontal Layout (For Child View) -->
+                <LinearLayout
+                    android:id="@+id/layout_left_horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:visibility="gone">
+                    <TextView
+                        android:id="@+id/txt_left_amount_h"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="₩ 0"
+                        android:textColor="#FFFFFF"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/txt_left_refund_h"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="환급액: ₩ 0"
+                        android:textColor="#CCFFFFFF"
+                        android:textSize="9sp" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Right Info (도권) -->
+            <LinearLayout
+                android:id="@+id/layout_right"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="vertical">
+                
+                <!-- 2nd Row: Name -->
+                <TextView
+                    android:id="@+id/txt_right_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="도권"
+                    android:textColor="#B3FFFFFF"
+                    android:textSize="12sp" />
+
+                <!-- 🏥 Vertical Layout (For Parent View) -->
+                <LinearLayout
+                    android:id="@+id/layout_right_vertical"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="visible">
+                    <TextView
+                        android:id="@+id/txt_right_amount_v"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="₩ 0"
+                        android:textColor="#FFFFFF"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/txt_right_refund_v"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="환급액: ₩ 0"
+                        android:textColor="#CCFFFFFF"
+                        android:textSize="10sp" />
+                </LinearLayout>
+
+                <!-- 🏥 Horizontal Layout (For Child View) -->
+                <LinearLayout
+                    android:id="@+id/layout_right_horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:visibility="gone">
+                    <TextView
+                        android:id="@+id/txt_right_amount_h"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="₩ 0"
+                        android:textColor="#FFFFFF"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:id="@+id/txt_right_refund_h"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="환급액: ₩ 0"
+                        android:textColor="#CCFFFFFF"
+                        android:textSize="9sp" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</RelativeLayout>
