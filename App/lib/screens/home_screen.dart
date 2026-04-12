@@ -195,9 +195,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
         // 🛡️ 역할별 레이블 최적화 (v32.4)
         final String title = isAdmin ? '승인 대기' : '승인 요청 중';
-        final String msg = isAdmin 
             ? '총 ${count}건의 요청이 기다리고 있어요!' 
-            : '내가 보낸 ${count}건의 요청이 성실히 검토 중이에요.';
+            : '요청이 검토 중이에요.';
 
         return GestureDetector(
           onTap: () => _showApprovalDetails(snapshot.data!),
@@ -254,51 +253,64 @@ class _HomeScreenState extends State<HomeScreen> {
         if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
         final all = snapshot.data!;
 
-        // 📊 채원 집계 (잔액은 전체 기간, 세금/환급은 올해 기준)
-        final cwHistory = all.where((t) => t.requester == 'cw').toList();
-        final cwYear = cwHistory.where((t) => t.timestamp.year == currentYear).toList();
-        
-        final cwPaid = cwYear.where((t) => t.type == 'payment').fold<int>(0, (s, t) => s + t.amount);
-        final cwUsage = cwYear.where((t) => t.type == 'usage').fold<int>(0, (s, t) => s + t.amount);
-        final cwMember = cwYear.where((t) => t.type == 'usage' && (t.isMembership || t.description.contains('회비'))).fold<int>(0, (s, t) => s + t.amount);
-        final cwRefund = ((cwUsage - cwMember) * 0.3).toInt();
-        
-        final cwTotalPaid = cwHistory.where((t) => t.type == 'payment').fold<int>(0, (s, t) => s + t.amount);
-        final cwTotalUsage = cwHistory.where((t) => t.type == 'usage').fold<int>(0, (s, t) => s + t.amount);
-        final cwBalance = cwTotalPaid - cwTotalUsage;
+        return StreamBuilder<List<TaxData>>(
+          stream: Rx.combineLatest2(
+            _dbService.getTaxData('cw'),
+            _dbService.getTaxData('dk'),
+            (cw, dk) => [cw, dk],
+          ),
+          builder: (context, taxSnapshot) {
+            if (!taxSnapshot.hasData) return const Center(child: CircularProgressIndicator());
+            final taxDocs = taxSnapshot.data!;
+            final cwTaxDoc = taxDocs[0];
+            final dkTaxDoc = taxDocs[1];
 
-        // 📊 도권 집계
-        final dkHistory = all.where((t) => t.requester == 'dk').toList();
-        final dkYear = dkHistory.where((t) => t.timestamp.year == currentYear).toList();
-        
-        final dkPaid = dkYear.where((t) => t.type == 'payment').fold<int>(0, (s, t) => s + t.amount);
-        final dkUsage = dkYear.where((t) => t.type == 'usage').fold<int>(0, (s, t) => s + t.amount);
-        final dkMember = dkYear.where((t) => t.type == 'usage' && (t.isMembership || t.description.contains('회비'))).fold<int>(0, (s, t) => s + t.amount);
-        final dkRefund = ((dkUsage - dkMember) * 0.3).toInt();
-        
-        final dkTotalPaid = dkHistory.where((t) => t.type == 'payment').fold<int>(0, (s, t) => s + t.amount);
-        final dkTotalUsage = dkHistory.where((t) => t.type == 'usage').fold<int>(0, (s, t) => s + t.amount);
-        final dkBalance = dkTotalPaid - dkTotalUsage;
+            // 📊 채원 집계 (v32.5: 누적 세금 = 이월금 + 전체 납부내역)
+            final cwHistory = all.where((t) => t.requester == 'cw').toList();
+            final cwYear = cwHistory.where((t) => t.timestamp.year == currentYear).toList();
+            
+            // 올해 기준 환급액 (올해 사용액의 30%)
+            final cwUsageYear = cwYear.where((t) => t.type == 'usage').fold<int>(0, (s, t) => s + t.amount);
+            final cwMemberYear = cwYear.where((t) => t.type == 'usage' && (t.isMembership || t.description.contains('회비'))).fold<int>(0, (s, t) => s + t.amount);
+            final cwRefundYear = ((cwUsageYear - cwMemberYear) * 0.3).toInt();
+            
+            // 전체 누적 세금 및 잔액 계산
+            final cwTotalPaid = cwTaxDoc.initialCarryover + cwHistory.where((t) => t.type == 'payment').fold<int>(0, (s, t) => s + t.amount);
+            final cwTotalUsage = cwHistory.where((t) => t.type == 'usage').fold<int>(0, (s, t) => s + t.amount);
+            final cwBalance = cwTotalPaid - cwTotalUsage;
 
-        // 🛰️ 실시간 위젯 동기화 (v32.4)
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          _updateWidgets(
-            totalCw: cwBalance, totalDk: dkBalance,
-            refundCw: cwRefund, refundDk: dkRefund,
-            pendingCount: all.where((t) => t.status == 'pending').length,
-            userRole: _auth.currentUser?.email == 'taeoh0311@gmail.com' ? 'parent' : 
-                     ((_auth.currentUser?.email == 'ngc7331cw@gmail.com' || _auth.currentUser?.email == 'taeoh0317@gmail.com') ? 'cw' : 'dk'),
-          );
-        });
+            // 📊 도권 집계
+            final dkHistory = all.where((t) => t.requester == 'dk').toList();
+            final dkYear = dkHistory.where((t) => t.timestamp.year == currentYear).toList();
+            
+            final dkUsageYear = dkYear.where((t) => t.type == 'usage').fold<int>(0, (s, t) => s + t.amount);
+            final dkMemberYear = dkYear.where((t) => t.type == 'usage' && (t.isMembership || t.description.contains('회비'))).fold<int>(0, (s, t) => s + t.amount);
+            final dkRefundYear = ((dkUsageYear - dkMemberYear) * 0.3).toInt();
+            
+            final dkTotalPaid = dkTaxDoc.initialCarryover + dkHistory.where((t) => t.type == 'payment').fold<int>(0, (s, t) => s + t.amount);
+            final dkTotalUsage = dkHistory.where((t) => t.type == 'usage').fold<int>(0, (s, t) => s + t.amount);
+            final dkBalance = dkTotalPaid - dkTotalUsage;
 
-        return Row(
-          children: [
-            if (isAdmin || isCw) 
-              Expanded(child: _buildModernCard('채원', cwBalance, cwRefund, Colors.pink.shade50, Colors.pinkAccent)),
-            if (isAdmin) const SizedBox(width: 15),
-            if (isAdmin || isDk)
-              Expanded(child: _buildModernCard('도권', dkBalance, dkRefund, Colors.blue.shade50, Colors.blueAccent)),
-          ],
+            // 🛰️ 실시간 위젯 동기화 (v32.5)
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _updateWidgets(
+                totalCw: cwBalance, totalDk: dkBalance,
+                refundCw: cwRefundYear, refundDk: dkRefundYear,
+                pendingCount: all.where((t) => t.status == 'pending').length,
+                userRole: role,
+              );
+            });
+
+            return Row(
+              children: [
+                if (isAdmin || isCw) 
+                  Expanded(child: _buildModernCard('채원', cwBalance, cwRefundYear, Colors.pink.shade50, Colors.pinkAccent)),
+                if (isAdmin) const SizedBox(width: 15),
+                if (isAdmin || isDk)
+                  Expanded(child: _buildModernCard('도권', dkBalance, dkRefundYear, Colors.blue.shade50, Colors.blueAccent)),
+              ],
+            );
+          },
         );
       },
     );
@@ -308,6 +320,9 @@ class _HomeScreenState extends State<HomeScreen> {
     bool isDark = Theme.of(context).brightness == Brightness.dark;
     final format = NumberFormat.currency(locale: 'ko_KR', symbol: '₩ ', decimalDigits: 0);
     
+    final String role = _getUserRole(_auth.currentUser?.email);
+    final isChild = role == 'cw' || role == 'dk';
+
     return Container(
       padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
@@ -326,18 +341,49 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
           const SizedBox(height: 25),
-          Text(
-            format.format(balance),
-            style: GoogleFonts.notoSansKr(fontSize: 22, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              Icon(Icons.auto_awesome_rounded, color: mainColor, size: 14),
-              const SizedBox(width: 5),
-              Text('환급액: ${format.format(refund)}', style: TextStyle(color: mainColor, fontSize: 13, fontWeight: FontWeight.w500)),
-            ],
-          ),
+          if (!isChild) ...[
+            // 부모 모드: 기존 수직 배치
+            Text(
+              format.format(balance),
+              style: GoogleFonts.notoSansKr(fontSize: 22, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            Row(
+              children: [
+                Icon(Icons.auto_awesome_rounded, color: mainColor, size: 14),
+                const SizedBox(width: 5),
+                Text('환급액: ${format.format(refund)}', style: TextStyle(color: mainColor, fontSize: 13, fontWeight: FontWeight.w500)),
+              ],
+            ),
+          ] else ...[
+            // 자녀 모드: 2단 수평 배치 (1행: 라벨, 2행: 금액)
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('납부한 세금', style: TextStyle(color: Colors.grey, fontSize: 11)),
+                      const SizedBox(height: 4),
+                      Text(format.format(balance), style: GoogleFonts.notoSansKr(fontSize: 18, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                ),
+                Container(width: 1, height: 30, color: mainColor.withOpacity(0.1)),
+                const SizedBox(width: 15),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text('환급액', style: TextStyle(color: Colors.grey, fontSize: 11)),
+                      const SizedBox(height: 4),
+                      Text(format.format(refund), style: GoogleFonts.notoSansKr(fontSize: 18, fontWeight: FontWeight.bold, color: mainColor)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );
@@ -689,27 +735,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   final tx = txs[index];
                   final isDark = Theme.of(context).brightness == Brightness.dark;
                   // 여기서 승인/거절 또는 수정/취소 UI 구현
-                  return Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: isDark ? Colors.white.withOpacity(0.05) : Colors.grey.withOpacity(0.05),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                      title: Text(tx.description, style: const TextStyle(fontWeight: FontWeight.bold)),
-                      subtitle: Text('${tx.requester == 'cw' ? '채원' : '도권'} · ${tx.amount}원'),
-                      trailing: _auth.currentUser?.email == 'taeoh0311@gmail.com' 
-                        ? Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              ElevatedButton(onPressed: () => _dbService.approveRequest(tx.id, tx), style: ElevatedButton.styleFrom(backgroundColor: Colors.blueAccent, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))), child: const Text('승인', style: TextStyle(color: Colors.white))),
-                              const SizedBox(width: 8),
-                              TextButton(onPressed: () => _dbService.rejectRequest(tx.id), child: const Text('거절', style: TextStyle(color: Colors.red))),
-                            ],
-                          )
-                        : null,
-                    ),
+                  // v32.5: 디자인 통일 (요청 내역도 거래 내역처럼)
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                    child: _buildSimplifiedTransactionCard(tx),
                   );
                 },
               ),

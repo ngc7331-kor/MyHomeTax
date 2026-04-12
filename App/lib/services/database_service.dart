@@ -4,8 +4,14 @@ class TaxData {
   final String name;
   final int totalTax;
   final int totalRefund;
+  final int initialCarryover;
 
-  TaxData({required this.name, required this.totalTax, required this.totalRefund});
+  TaxData({
+    required this.name, 
+    required this.totalTax, 
+    required this.totalRefund,
+    this.initialCarryover = 0,
+  });
 
   factory TaxData.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>? ?? {};
@@ -13,6 +19,7 @@ class TaxData {
       name: data['name'] ?? '',
       totalTax: data['totalTax'] ?? 0,
       totalRefund: data['totalRefund'] ?? 0,
+      initialCarryover: data['initialCarryover'] ?? 0,
     );
   }
 }

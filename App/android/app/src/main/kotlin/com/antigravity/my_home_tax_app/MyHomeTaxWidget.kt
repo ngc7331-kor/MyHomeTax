@@ -58,11 +58,29 @@ class MyHomeTaxWidget : AppWidgetProvider() {
         private const val KEY_UPDATE_TIME = "lastUpdateTime"
 
         fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
-            val sharedPrefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+            val prefsFiles = arrayOf("HomeWidgetPreferences", "com.antigravity.my_home_tax_app_preferences", "FlutterSharedPreferences")
+            var finalSharedPrefs: SharedPreferences? = null
+            
+            for (fileName in prefsFiles) {
+                val sp = context.getSharedPreferences(fileName, Context.MODE_PRIVATE)
+                if (sp.contains("flutter.$KEY_IS_LOGGED_IN") || sp.contains(KEY_IS_LOGGED_IN)) {
+                    finalSharedPrefs = sp
+                    break
+                }
+            }
+            
+            val sharedPrefs = finalSharedPrefs ?: context.getSharedPreferences(prefsFiles[0], Context.MODE_PRIVATE)
             
             val getSafeBool = { key: String, def: Boolean ->
                 val finalKey = if (sharedPrefs.contains("flutter.$key")) "flutter.$key" else key
-                sharedPrefs.getBoolean(finalKey, def)
+                var result = def
+                if (sharedPrefs.contains(finalKey)) {
+                    try { result = sharedPrefs.getBoolean(finalKey, def) } 
+                    catch (e: Exception) {
+                        try { result = sharedPrefs.getString(finalKey, def.toString())?.toBoolean() ?: def } catch (e2: Exception) { }
+                    }
+                }
+                result
             }
 
             val getSafeString = { key: String, def: String ->
@@ -105,7 +123,7 @@ class MyHomeTaxWidget : AppWidgetProvider() {
 
                     views.setTextViewText(R.id.txt_widget_title, "우리집 세금")
                     views.setTextViewText(R.id.txt_pending_count, pendingCount.toString())
-                    views.setViewVisibility(R.id.layout_badge, View.VISIBLE)
+                    views.setViewVisibility(R.id.layout_badge, if (pendingCount > 0) View.VISIBLE else View.GONE)
 
                     if (userRole == "parent") {
                         views.setViewVisibility(R.id.txt_badge_label, View.VISIBLE)
@@ -123,20 +141,26 @@ class MyHomeTaxWidget : AppWidgetProvider() {
                         views.setTextViewText(R.id.txt_right_refund_v, dkRefund)
                     } else {
                         views.setTextViewText(R.id.txt_badge_label, "승인 요청 중")
+                        
+                        // 자녀 계정 레이아웃 - 금액만 표시 (환급액 라벨 제거 로직은 XML 업데이트와 함께 수행)
+                        val fixAmount = { amt: String -> amt.replace("환급액: ", "") }
+
                         if (userRole == "cw") {
                             views.setViewVisibility(R.id.layout_left, View.VISIBLE)
                             views.setViewVisibility(R.id.layout_left_vertical, View.GONE)
                             views.setViewVisibility(R.id.layout_left_horizontal, View.VISIBLE)
                             views.setViewVisibility(R.id.layout_right, View.GONE)
+                            
                             views.setTextViewText(R.id.txt_left_amount_h, cwTotal)
-                            views.setTextViewText(R.id.txt_left_refund_h, cwRefund)
+                            views.setTextViewText(R.id.txt_left_refund_h, fixAmount(cwRefund))
                         } else {
                             views.setViewVisibility(R.id.layout_left, View.GONE)
                             views.setViewVisibility(R.id.layout_right, View.VISIBLE)
                             views.setViewVisibility(R.id.layout_right_vertical, View.GONE)
                             views.setViewVisibility(R.id.layout_right_horizontal, View.VISIBLE)
+                            
                             views.setTextViewText(R.id.txt_right_amount_h, dkTotal)
-                            views.setTextViewText(R.id.txt_right_refund_h, dkRefund)
+                            views.setTextViewText(R.id.txt_right_refund_h, fixAmount(dkRefund))
                         }
                     }
                     views.setTextViewText(R.id.txt_last_updated, "최종 확인: $updateTime")
