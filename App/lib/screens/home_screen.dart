@@ -195,6 +195,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
         // 🛡️ 역할별 레이블 최적화 (v32.4)
         final String title = isAdmin ? '승인 대기' : '승인 요청 중';
+        final String msg = isAdmin 
             ? '총 ${count}건의 요청이 기다리고 있어요!' 
             : '요청이 검토 중이에요.';
 
@@ -265,31 +266,24 @@ class _HomeScreenState extends State<HomeScreen> {
             final cwTaxDoc = taxDocs[0];
             final dkTaxDoc = taxDocs[1];
 
-            // 📊 채원 집계 (v32.5: 누적 세금 = 이월금 + 전체 납부내역)
-            final cwHistory = all.where((t) => t.requester == 'cw').toList();
-            final cwYear = cwHistory.where((t) => t.timestamp.year == currentYear).toList();
+            // 📊 채원 집계 (v34: Firestore 필드 직접 참조 및 초기 이월금 합산으로 정확도 100% 확보)
+            final cwBalance = cwTaxDoc.initialCarryover + cwTaxDoc.totalTax;
             
             // 올해 기준 환급액 (올해 사용액의 30%)
+            final cwHistory = all.where((t) => t.requester == 'cw').toList();
+            final cwYear = cwHistory.where((t) => t.timestamp.year == currentYear).toList();
             final cwUsageYear = cwYear.where((t) => t.type == 'usage').fold<int>(0, (s, t) => s + t.amount);
             final cwMemberYear = cwYear.where((t) => t.type == 'usage' && (t.isMembership || t.description.contains('회비'))).fold<int>(0, (s, t) => s + t.amount);
             final cwRefundYear = ((cwUsageYear - cwMemberYear) * 0.3).toInt();
             
-            // 전체 누적 세금 및 잔액 계산
-            final cwTotalPaid = cwTaxDoc.initialCarryover + cwHistory.where((t) => t.type == 'payment').fold<int>(0, (s, t) => s + t.amount);
-            final cwTotalUsage = cwHistory.where((t) => t.type == 'usage').fold<int>(0, (s, t) => s + t.amount);
-            final cwBalance = cwTotalPaid - cwTotalUsage;
-
-            // 📊 도권 집계
+            // 📊 도권 집계 (초기 이월금 합산)
+            final dkBalance = dkTaxDoc.initialCarryover + dkTaxDoc.totalTax;
+            
             final dkHistory = all.where((t) => t.requester == 'dk').toList();
             final dkYear = dkHistory.where((t) => t.timestamp.year == currentYear).toList();
-            
             final dkUsageYear = dkYear.where((t) => t.type == 'usage').fold<int>(0, (s, t) => s + t.amount);
             final dkMemberYear = dkYear.where((t) => t.type == 'usage' && (t.isMembership || t.description.contains('회비'))).fold<int>(0, (s, t) => s + t.amount);
             final dkRefundYear = ((dkUsageYear - dkMemberYear) * 0.3).toInt();
-            
-            final dkTotalPaid = dkTaxDoc.initialCarryover + dkHistory.where((t) => t.type == 'payment').fold<int>(0, (s, t) => s + t.amount);
-            final dkTotalUsage = dkHistory.where((t) => t.type == 'usage').fold<int>(0, (s, t) => s + t.amount);
-            final dkBalance = dkTotalPaid - dkTotalUsage;
 
             // 🛰️ 실시간 위젯 동기화 (v32.5)
             WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -300,6 +294,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 userRole: role,
               );
             });
+
 
             return Row(
               children: [
@@ -363,7 +358,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('납부한 세금', style: TextStyle(color: Colors.grey, fontSize: 11)),
+                      const Text('세금 잔액', style: TextStyle(color: Colors.grey, fontSize: 11)),
                       const SizedBox(height: 4),
                       Text(format.format(balance), style: GoogleFonts.notoSansKr(fontSize: 18, fontWeight: FontWeight.bold)),
                     ],

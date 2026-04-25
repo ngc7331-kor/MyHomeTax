@@ -30,4 +30,5 @@ class WidgetService {
 
     await HomeWidget.updateWidget(name: androidWidgetName);
   }
+
 }

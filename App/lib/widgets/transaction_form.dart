@@ -17,7 +17,7 @@ class _TransactionFormState extends State<TransactionForm> {
   final _descriptionController = TextEditingController();
   
   String _category = 'payment'; // 'payment' (납부), 'usage' (사용)
-  String _usageType = 'general'; // 'general' (일반), 'membership' (회비)
+  String? _usageType; // 'general' (일반), 'membership' (회비) (v34: 기본값 제거)
   String? _target; // 'cw', 'dk', 'both'
   DateTime _selectedDate = DateTime.now();
 
@@ -120,7 +120,7 @@ class _TransactionFormState extends State<TransactionForm> {
                       children: [
                         _buildSubOptionButton('💳 일반 소비', 'general'),
                         const SizedBox(width: 12),
-                        _buildSubOptionButton('🏆 회비/기타', 'membership'),
+                        _buildSubOptionButton('🏆 회비', 'membership'),
                       ],
                     ),
                     const SizedBox(height: 28),
@@ -291,12 +291,15 @@ class _TransactionFormState extends State<TransactionForm> {
         String label = t == 'cw' ? '채원' : (t == 'dk' ? '도권' : '함께');
         return Expanded(
           child: GestureDetector(
-            onTap: () => setState(() => _target = t),
+            onTap: () {
+              setState(() => _target = t);
+              _updateAutoAmount(); // 금액 자동 입력 로직 실행
+            },
             child: Container(
               margin: const EdgeInsets.only(right: 8),
               padding: const EdgeInsets.symmetric(vertical: 14),
               decoration: BoxDecoration(
-                color: isSelected ? Colors.blueAccent.withOpacity(0.1) : Colors.transparent,
+                color: isSelected ? Colors.blueAccent.withOpacity(0.1) : (isSelected ? Colors.transparent : Colors.transparent),
                 border: Border.all(color: isSelected ? Colors.blueAccent : Colors.grey.withOpacity(0.2)),
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -308,6 +311,17 @@ class _TransactionFormState extends State<TransactionForm> {
         );
       }).toList(),
     );
+  }
+
+  // 💡 자동 금액 설정 (v34)
+  void _updateAutoAmount() {
+    if (_category == 'usage' && _usageType == 'membership') {
+      if (_target == 'cw') {
+        _amountController.text = '5,000';
+      } else if (_target == 'dk') {
+        _amountController.text = '3,000';
+      }
+    }
   }
 
   Widget _buildSectionTitle(String title) {

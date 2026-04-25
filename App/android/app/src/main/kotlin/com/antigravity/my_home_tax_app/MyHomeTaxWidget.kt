@@ -51,21 +51,23 @@ class MyHomeTaxWidget : AppWidgetProvider() {
         private const val KEY_IS_LOGGED_IN = "isLoggedIn"
         private const val KEY_USER_ROLE = "userRole"
         private const val KEY_PENDING = "pendingCount"
-        private const val KEY_CW_TOTAL = "cwTotalAmount"
-        private const val KEY_CW_REFUND = "cwRefundAmount"
-        private const val KEY_DK_TOTAL = "dkTotalAmount"
-        private const val KEY_DK_REFUND = "dkRefundAmount"
-        private const val KEY_UPDATE_TIME = "lastUpdateTime"
+        private const val KEY_CW_TOTAL = "cwTotal"
+        private const val KEY_CW_REFUND = "cwRefund"
+        private const val KEY_DK_TOTAL = "dkTotal"
+        private const val KEY_DK_REFUND = "dkRefund"
+        private const val KEY_UPDATE_TIME = "updateTime"
 
         fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
+            // HomeWidget은 기본적으로 'HomeWidgetPreferences'를 사용하므로 최우선 순위로 설정
             val prefsFiles = arrayOf("HomeWidgetPreferences", "com.antigravity.my_home_tax_app_preferences", "FlutterSharedPreferences")
             var finalSharedPrefs: SharedPreferences? = null
             
             for (fileName in prefsFiles) {
                 val sp = context.getSharedPreferences(fileName, Context.MODE_PRIVATE)
+                // isLoggedIn 또는 flutter.isLoggedIn 중 하나라도 있으면 해당 파일을 사용
                 if (sp.contains("flutter.$KEY_IS_LOGGED_IN") || sp.contains(KEY_IS_LOGGED_IN)) {
                     finalSharedPrefs = sp
-                    break
+                    if (fileName == "HomeWidgetPreferences") break // 최우선 순위 파일이면 즉시 중단
                 }
             }
             
@@ -77,7 +79,10 @@ class MyHomeTaxWidget : AppWidgetProvider() {
                 if (sharedPrefs.contains(finalKey)) {
                     try { result = sharedPrefs.getBoolean(finalKey, def) } 
                     catch (e: Exception) {
-                        try { result = sharedPrefs.getString(finalKey, def.toString())?.toBoolean() ?: def } catch (e2: Exception) { }
+                        try { 
+                            val strVal = sharedPrefs.getString(finalKey, def.toString())
+                            result = strVal?.toBoolean() ?: (strVal == "true") 
+                        } catch (e2: Exception) { }
                     }
                 }
                 result
@@ -104,16 +109,17 @@ class MyHomeTaxWidget : AppWidgetProvider() {
             views.setInt(R.id.widget_bg, "setImageAlpha", 204)
 
             try {
+                // 🔐 로그인 상태 무결성 강화 (v34: LToBank 스타일)
                 val isLoggedIn = getSafeBool(KEY_IS_LOGGED_IN, false)
-                
-                if (!isLoggedIn) {
+                val userRole = getSafeString(KEY_USER_ROLE, "")
+
+                if (!isLoggedIn || userRole.isEmpty()) {
                     views.setViewVisibility(R.id.txt_login_required, View.VISIBLE)
                     views.setViewVisibility(R.id.layout_data_container, View.GONE)
                 } else {
                     views.setViewVisibility(R.id.txt_login_required, View.GONE)
                     views.setViewVisibility(R.id.layout_data_container, View.VISIBLE)
                     
-                    val userRole = getSafeString(KEY_USER_ROLE, "parent")
                     val pendingCount = getSafeInt(KEY_PENDING, 0)
                     val cwTotal = getSafeString(KEY_CW_TOTAL, "₩ 0")
                     val cwRefund = getSafeString(KEY_CW_REFUND, "환급액: ₩ 0")
@@ -126,41 +132,44 @@ class MyHomeTaxWidget : AppWidgetProvider() {
                     views.setViewVisibility(R.id.layout_badge, if (pendingCount > 0) View.VISIBLE else View.GONE)
 
                     if (userRole == "parent") {
-                        views.setViewVisibility(R.id.txt_badge_label, View.VISIBLE)
                         views.setTextViewText(R.id.txt_badge_label, "승인대기")
                         views.setViewVisibility(R.id.layout_left, View.VISIBLE)
+                        views.setViewVisibility(R.id.txt_left_name, View.VISIBLE)
                         views.setViewVisibility(R.id.layout_left_vertical, View.VISIBLE)
-                        views.setViewVisibility(R.id.layout_left_horizontal, View.GONE)
+                        views.setViewVisibility(R.id.layout_left_vertical_child, View.GONE)
+                        
                         views.setViewVisibility(R.id.layout_right, View.VISIBLE)
+                        views.setViewVisibility(R.id.txt_right_name, View.VISIBLE)
                         views.setViewVisibility(R.id.layout_right_vertical, View.VISIBLE)
-                        views.setViewVisibility(R.id.layout_right_horizontal, View.GONE)
+                        views.setViewVisibility(R.id.layout_right_vertical_child, View.GONE)
 
                         views.setTextViewText(R.id.txt_left_amount_v, cwTotal)
                         views.setTextViewText(R.id.txt_left_refund_v, cwRefund)
                         views.setTextViewText(R.id.txt_right_amount_v, dkTotal)
                         views.setTextViewText(R.id.txt_right_refund_v, dkRefund)
                     } else {
+                        // 🧒 자녀 계정 레이아웃 (v34: 이름 숨기기 및 수직 반응형 배치)
                         views.setTextViewText(R.id.txt_badge_label, "승인 요청 중")
-                        
-                        // 자녀 계정 레이아웃 - 금액만 표시 (환급액 라벨 제거 로직은 XML 업데이트와 함께 수행)
-                        val fixAmount = { amt: String -> amt.replace("환급액: ", "") }
+                        val cleanAmt = { amt: String -> amt.replace("환급액: ", "") }
 
                         if (userRole == "cw") {
                             views.setViewVisibility(R.id.layout_left, View.VISIBLE)
+                            views.setViewVisibility(R.id.txt_left_name, View.GONE) // 이름 숨기기
                             views.setViewVisibility(R.id.layout_left_vertical, View.GONE)
-                            views.setViewVisibility(R.id.layout_left_horizontal, View.VISIBLE)
+                            views.setViewVisibility(R.id.layout_left_vertical_child, View.VISIBLE) // 수직 배치 활성화
                             views.setViewVisibility(R.id.layout_right, View.GONE)
                             
-                            views.setTextViewText(R.id.txt_left_amount_h, cwTotal)
-                            views.setTextViewText(R.id.txt_left_refund_h, fixAmount(cwRefund))
+                            views.setTextViewText(R.id.txt_left_amount_c, cwTotal)
+                            views.setTextViewText(R.id.txt_left_refund_c, cleanAmt(cwRefund))
                         } else {
                             views.setViewVisibility(R.id.layout_left, View.GONE)
                             views.setViewVisibility(R.id.layout_right, View.VISIBLE)
+                            views.setViewVisibility(R.id.txt_right_name, View.GONE) // 이름 숨기기
                             views.setViewVisibility(R.id.layout_right_vertical, View.GONE)
-                            views.setViewVisibility(R.id.layout_right_horizontal, View.VISIBLE)
+                            views.setViewVisibility(R.id.layout_right_vertical_child, View.VISIBLE) // 수직 배치 활성화
                             
-                            views.setTextViewText(R.id.txt_right_amount_h, dkTotal)
-                            views.setTextViewText(R.id.txt_right_refund_h, fixAmount(dkRefund))
+                            views.setTextViewText(R.id.txt_right_amount_c, dkTotal)
+                            views.setTextViewText(R.id.txt_right_refund_c, cleanAmt(dkRefund))
                         }
                     }
                     views.setTextViewText(R.id.txt_last_updated, "최종 확인: $updateTime")

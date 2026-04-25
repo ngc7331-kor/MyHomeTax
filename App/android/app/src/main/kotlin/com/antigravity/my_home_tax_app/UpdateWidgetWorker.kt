@@ -57,14 +57,15 @@ class UpdateWidgetWorker(context: Context, params: WorkerParameters) : Worker(co
             // actually we can ignore isLoggedIn for now and just write the data because the worker only runs if they authorized the widget
             
             // Save to SharedPreferences securely for Flutter sync (using flutter. prefix)
-            val sharedPrefs = applicationContext.getSharedPreferences("com.antigravity.my_home_tax_app_preferences", Context.MODE_PRIVATE)
+            val sharedPrefs = applicationContext.getSharedPreferences("HomeWidgetPreferences", Context.MODE_PRIVATE)
             sharedPrefs.edit().apply {
-                putLong("flutter.cwTotal", cwTotal)
-                putLong("flutter.dkTotal", dkTotal)
-                putLong("flutter.cwRefund", cwRefund)
-                putLong("flutter.dkRefund", dkRefund)
+                putBoolean("flutter.isLoggedIn", true)
                 putInt("flutter.pendingCount", pendingCount)
-                putLong("flutter.lastUpdated", json.optLong("updatedAt", System.currentTimeMillis()))
+                putString("flutter.cwTotalAmount", "₩ " + java.text.NumberFormat.getInstance().format(cwTotal))
+                putString("flutter.cwRefundAmount", "환급액: ₩ " + java.text.NumberFormat.getInstance().format(cwRefund))
+                putString("flutter.dkTotalAmount", "₩ " + java.text.NumberFormat.getInstance().format(dkTotal))
+                putString("flutter.dkRefundAmount", "환급액: ₩ " + java.text.NumberFormat.getInstance().format(dkRefund))
+                putString("flutter.lastUpdateTime", java.text.SimpleDateFormat("HH:mm", java.util.Locale.KOREA).format(java.util.Date()))
                 apply()
             }
 
