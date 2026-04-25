@@ -1,7 +1,14 @@
 node_modules/
 .DS_Store
 Code_Real.gs
-Code.gs
-index.html
 
+# 핵심 소스 코드는 푸시하되 개인정보에 유의
+# Code.gs
+# index.html
+
+# 보안 민감 파일 제외
+key.properties
+**/*.keystore
+**/*.jks
+google-services.json
 App/assets/secrets/
