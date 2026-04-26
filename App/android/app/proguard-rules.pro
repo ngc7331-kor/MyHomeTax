@@ -1,21 +1,12 @@
-# Flutter Proguard Rules
--keep class io.flutter.app.** { *; }
--keep class io.flutter.plugin.** { *; }
--keep class io.flutter.util.** { *; }
--keep class io.flutter.view.** { *; }
--keep class io.flutter.** { *; }
--keep class io.flutter.plugins.** { *; }
+# Flutter �?HomeWidget 보호 규칙
+-keep class com.antigravity.my_home_tax_app.my_home_tax_appWidget { *; }
+-keep public class * extends es.antonborri.home_widget.HomeWidgetProvider
+-keep public class * extends android.appwidget.AppWidgetProvider
 
-# SharedPreferences and HomeWidget preservation
--keep class com.antigravity.my_home_tax_app.** { *; }
--keep class androidx.work.** { *; }
--keep class android.appwidget.** { *; }
--keep class android.content.SharedPreferences { *; }
--keep class com.google.firebase.** { *; }
+# RemoteViews 관???�래??보호
+-keep class android.widget.RemoteViews { *; }
+-keep class android.content.Context { *; }
+-keep class android.content.Intent { *; }
 
-# Fix R8 compilation errors (Missing classes)
--dontwarn com.google.android.play.core.**
--dontwarn io.flutter.embedding.engine.deferredcomponents.**
--dontwarn javax.annotation.**
--dontwarn org.checkerframework.**
--dontwarn com.google.errorprone.annotations.**
+# Kotlin ?��???보호
+-keep class kotlin.jvm.internal.** { *; }

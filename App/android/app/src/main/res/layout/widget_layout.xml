@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:padding="0dp">
 
-    <!-- Background (80% Alpha for Glassmorphism) -->
+    <!-- Background -->
     <ImageView
         android:id="@+id/widget_bg"
         android:layout_width="match_parent"
@@ -13,7 +13,7 @@
         android:scaleType="fitXY"
         android:alpha="0.8" />
 
-    <!-- 5th Row: Last Updated (Fixed at Bottom) -->
+    <!-- Last Updated -->
     <TextView
         android:id="@+id/txt_last_updated"
         android:layout_width="match_parent"
@@ -22,11 +22,11 @@
         android:gravity="end"
         android:paddingEnd="14dp"
         android:paddingBottom="4dp"
-        android:text="최종 확인: --:--"
+        android:text="Updated: --:--"
         android:textColor="#80FFFFFF"
         android:textSize="8sp" />
 
-    <!-- Login Required Mask -->
+    <!-- Login Required -->
     <LinearLayout
         android:id="@+id/txt_login_required"
         android:layout_width="match_parent"
@@ -35,7 +35,7 @@
         android:orientation="horizontal"
         android:paddingHorizontal="14dp"
         android:paddingTop="8dp"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <ImageView
             android:layout_width="20dp"
@@ -46,13 +46,12 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="로그인이 필요합니다."
+            android:text="Login Required"
             android:textColor="#FFFFFF"
             android:textSize="12sp"
             android:textStyle="bold" />
     </LinearLayout>
 
-    <!-- Main Content Container -->
     <LinearLayout
         android:id="@+id/layout_data_container"
         android:layout_width="match_parent"
@@ -62,9 +61,8 @@
         android:gravity="top"
         android:paddingHorizontal="14dp"
         android:paddingTop="8dp"
-        android:visibility="gone">
+        android:visibility="visible">
 
-        <!-- 1st Row: Logo, Title, Badge -->
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -84,29 +82,28 @@
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@id/img_logo"
                 android:layout_marginStart="6dp"
-                android:text="우리집 세금"
+                android:text="My Home Tax"
                 android:textColor="#FFFFFF"
                 android:textSize="14sp"
                 android:textStyle="bold"
                 android:layout_centerVertical="true" />
 
-            <!-- Pending Badge -->
             <LinearLayout
                 android:id="@+id/layout_badge"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
-                android:background="@drawable/badge_background"
+                android:background="@drawable/widget_badge_background"
                 android:gravity="center"
                 android:paddingHorizontal="6dp"
                 android:paddingVertical="2dp"
                 android:visibility="visible">
 
                 <TextView
-                    android:id="@+id/txt_badge_label"
+                    android:id="@+id/txt_pending_label"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="승인대기"
+                    android:text="Pending "
                     android:textColor="#FFFFFF"
                     android:textSize="9sp"
                     android:layout_marginEnd="3dp" />
@@ -122,293 +119,107 @@
             </LinearLayout>
         </RelativeLayout>
 
-        <!-- Container for 2nd, 3rd, 4th Rows -->
         <LinearLayout
+            android:id="@+id/layout_accounts"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal"
-            android:gravity="center_vertical"
+            android:gravity="center"
             android:baselineAligned="false">
 
-            <!-- Left Info (채원) -->
             <LinearLayout
                 android:id="@+id/layout_left"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:layout_marginVertical="2dp">
 
-                <!-- 2nd Row: Name -->
                 <TextView
                     android:id="@+id/txt_left_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="채원"
-                    android:textColor="#B3FFFFFF"
-                    android:textSize="12sp" />
+                    android:text="CW"
+                    android:textColor="#CCFFFFFF"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="2dp" />
 
-                <!-- 🏥 Vertical Layout (For Parent View) -->
                 <LinearLayout
-                    android:id="@+id/layout_left_vertical"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:visibility="visible">
-                    <TextView
-                        android:id="@+id/txt_left_amount_v"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="₩ 0"
-                        android:textColor="#FFFFFF"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
-                    <TextView
-                        android:id="@+id/txt_left_refund_v"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="환급액: ₩ 0"
-                        android:textColor="#CCFFFFFF"
-                        android:textSize="10sp" />
-                </LinearLayout>
-
-                <!-- 🏥 Vertical Child Layout (v34: 수직 반응형 배치) -->
-                <LinearLayout
-                    android:id="@+id/layout_left_vertical_child"
+                    android:id="@+id/layout_left_data"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:gravity="center"
-                    android:visibility="gone">
+                    android:gravity="center">
+
                     <TextView
+                        android:id="@+id/txt_left_amount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="납부한 세금"
-                        android:textColor="#B3FFFFFF"
-                        android:textSize="10sp" />
-                    <TextView
-                        android:id="@+id/txt_left_amount_c"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="₩ 0"
+                        android:text="0"
                         android:textColor="#FFFFFF"
-                        android:textSize="22sp"
-                        android:textStyle="bold" />
-                    <View
-                        android:layout_width="40dp"
-                        android:layout_height="1dp"
-                        android:background="#33FFFFFF"
-                        android:layout_marginVertical="6dp"/>
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="환급액"
-                        android:textColor="#B3FFFFFF"
-                        android:textSize="10sp" />
-                    <TextView
-                        android:id="@+id/txt_left_refund_c"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="₩ 0"
-                        android:textColor="#CCFFFFFF"
-                        android:textSize="20sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:maxLines="1"
+                        android:ellipsize="end" />
 
-                <!-- 🏥 Horizontal Layout (Old version) -->
-                <LinearLayout
-                    android:id="@+id/layout_left_horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center"
-                    android:visibility="gone">
-                    
-                    <!-- Tax Column -->
-                    <LinearLayout
+                    <TextView
+                        android:id="@+id/txt_left_interest"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:layout_marginEnd="30dp">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="납부한 세금"
-                            android:textColor="#B3FFFFFF"
-                            android:textSize="9sp" />
-                        <TextView
-                            android:id="@+id/txt_left_amount_h"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="₩ 0"
-                            android:textColor="#FFFFFF"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-
-                    <!-- Refund Column -->
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:gravity="center">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="환급액"
-                            android:textColor="#B3FFFFFF"
-                            android:textSize="9sp" />
-                        <TextView
-                            android:id="@+id/txt_left_refund_h"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="₩ 0"
-                            android:textColor="#CCFFFFFF"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
+                        android:text="(+0)"
+                        android:textColor="#D9FFFFFF"
+                        android:textSize="12sp"
+                        android:layout_marginTop="1dp" />
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- Right Info (도권) -->
             <LinearLayout
                 android:id="@+id/layout_right"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:layout_marginVertical="2dp">
                 
-                <!-- 2nd Row: Name -->
                 <TextView
                     android:id="@+id/txt_right_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="도권"
-                    android:textColor="#B3FFFFFF"
-                    android:textSize="12sp" />
+                    android:text="DK"
+                    android:textColor="#CCFFFFFF"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="2dp" />
 
-                <!-- 🏥 Vertical Layout (For Parent View) -->
                 <LinearLayout
-                    android:id="@+id/layout_right_vertical"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:visibility="visible">
-                    <TextView
-                        android:id="@+id/txt_right_amount_v"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="₩ 0"
-                        android:textColor="#FFFFFF"
-                        android:textSize="15sp"
-                        android:textStyle="bold" />
-                    <TextView
-                        android:id="@+id/txt_right_refund_v"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="환급액: ₩ 0"
-                        android:textColor="#CCFFFFFF"
-                        android:textSize="10sp" />
-                </LinearLayout>
-
-                <!-- 🏥 Vertical Child Layout (v34: 수직 반응형 배치) -->
-                <LinearLayout
-                    android:id="@+id/layout_right_vertical_child"
+                    android:id="@+id/layout_right_data"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:gravity="center"
-                    android:visibility="gone">
+                    android:gravity="center">
+
                     <TextView
+                        android:id="@+id/txt_right_amount"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="납부한 세금"
-                        android:textColor="#B3FFFFFF"
-                        android:textSize="10sp" />
-                    <TextView
-                        android:id="@+id/txt_right_amount_c"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="₩ 0"
+                        android:text="0"
                         android:textColor="#FFFFFF"
-                        android:textSize="22sp"
-                        android:textStyle="bold" />
-                    <View
-                        android:layout_width="40dp"
-                        android:layout_height="1dp"
-                        android:background="#33FFFFFF"
-                        android:layout_marginVertical="6dp"/>
+                        android:textSize="18sp"
+                        android:textStyle="bold"
+                        android:maxLines="1"
+                        android:ellipsize="end" />
+
                     <TextView
+                        android:id="@+id/txt_right_interest"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="환급액"
-                        android:textColor="#B3FFFFFF"
-                        android:textSize="10sp" />
-                    <TextView
-                        android:id="@+id/txt_right_refund_c"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="₩ 0"
-                        android:textColor="#CCFFFFFF"
-                        android:textSize="20sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
-                <!-- 🏥 Horizontal Layout (Old version) -->
-                <LinearLayout
-                    android:id="@+id/layout_right_horizontal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center"
-                    android:visibility="gone">
-
-                    <!-- Tax Column -->
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:gravity="center"
-                        android:layout_marginEnd="30dp">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="납부한 세금"
-                            android:textColor="#B3FFFFFF"
-                            android:textSize="9sp" />
-                        <TextView
-                            android:id="@+id/txt_right_amount_h"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="₩ 0"
-                            android:textColor="#FFFFFF"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-
-                    <!-- Refund Column -->
-                    <LinearLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:gravity="center">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="환급액"
-                            android:textColor="#B3FFFFFF"
-                            android:textSize="9sp" />
-                        <TextView
-                            android:id="@+id/txt_right_refund_h"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="₩ 0"
-                            android:textColor="#CCFFFFFF"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
+                        android:text="(+0)"
+                        android:textColor="#D9FFFFFF"
+                        android:textSize="12sp"
+                        android:layout_marginTop="1dp" />
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>

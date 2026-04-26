@@ -184,4 +184,18 @@ class DatabaseService {
       'rejectedAt': FieldValue.serverTimestamp(),
     });
   }
+
+  // ✏️ 요청 수정 처리 (v51 추가)
+  Future<void> updateRequest(String approvalId, int newAmount, String newDescription) async {
+    await _db.collection('approvals').doc(approvalId).update({
+      'amount': newAmount,
+      'description': newDescription,
+      'updatedAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  // 🗑️ 요청 취소 처리 (v51 추가)
+  Future<void> cancelRequest(String approvalId) async {
+    await _db.collection('approvals').doc(approvalId).delete();
+  }
 }
