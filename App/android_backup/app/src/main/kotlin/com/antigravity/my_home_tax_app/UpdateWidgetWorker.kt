@@ -18,15 +18,15 @@ class UpdateWidgetWorker(context: Context, params: WorkerParameters) : Worker(co
 
     override fun doWork(): Result {
         return try {
-            // [Security Check] 로그아웃 상태이면 백그라운드 API 호출 차단
+            // [Security Check] 濡쒓렇?꾩썐 ?곹깭?대㈃ 諛깃렇?쇱슫??API ?몄텧 李⑤떒
             val prefs = applicationContext.getSharedPreferences("com.antigravity.my_home_tax_app_preferences", Context.MODE_PRIVATE)
             
-            // 구버전 키(isLoggedIn) 삭제 (충돌 방지)
+            // 援щ쾭????isLoggedIn) ??젣 (異⑸룎 諛⑹?)
             if (prefs.contains("isLoggedIn")) {
                 prefs.edit().remove("isLoggedIn").apply()
             }
 
-            // flutter. 접두어와 일반 키 모두 체크 (HomeWidget 호환성)
+            // flutter. ?묐몢?댁? ?쇰컲 ??紐⑤몢 泥댄겕 (HomeWidget ?명솚??
             val isLoggedIn = prefs.getBoolean("flutter.isLoggedIn", false) || prefs.getBoolean("isLoggedIn", false)
             if (!isLoggedIn) {
                 android.util.Log.d("UpdateWidgetWorker", "Logged Out: Skipping API Call")
@@ -53,7 +53,7 @@ class UpdateWidgetWorker(context: Context, params: WorkerParameters) : Worker(co
             val cwRefund = json.optLong("cwRefund", 0)
             val dkRefund = json.optLong("dkRefund", 0)
             val pendingCount = json.optInt("pendingCount", 0)
-            // LToBank doesn't have isLoggedIn in Worker response usually, but we assume true for widget if data fetches successfully 
+            // 위젯 데이터 처리 isLoggedIn in Worker response usually, but we assume true for widget if data fetches successfully 
             // actually we can ignore isLoggedIn for now and just write the data because the worker only runs if they authorized the widget
             
             // Save to SharedPreferences securely for Flutter sync (using flutter. prefix)
@@ -61,10 +61,10 @@ class UpdateWidgetWorker(context: Context, params: WorkerParameters) : Worker(co
             sharedPrefs.edit().apply {
                 putBoolean("flutter.isLoggedIn", true)
                 putInt("flutter.pendingCount", pendingCount)
-                putString("flutter.cwTotalAmount", "₩ " + java.text.NumberFormat.getInstance().format(cwTotal))
-                putString("flutter.cwRefundAmount", "환급액: ₩ " + java.text.NumberFormat.getInstance().format(cwRefund))
-                putString("flutter.dkTotalAmount", "₩ " + java.text.NumberFormat.getInstance().format(dkTotal))
-                putString("flutter.dkRefundAmount", "환급액: ₩ " + java.text.NumberFormat.getInstance().format(dkRefund))
+                putString("flutter.cwTotalAmount", "??" + java.text.NumberFormat.getInstance().format(cwTotal))
+                putString("flutter.cwRefundAmount", "?섍툒?? ??" + java.text.NumberFormat.getInstance().format(cwRefund))
+                putString("flutter.dkTotalAmount", "??" + java.text.NumberFormat.getInstance().format(dkTotal))
+                putString("flutter.dkRefundAmount", "?섍툒?? ??" + java.text.NumberFormat.getInstance().format(dkRefund))
                 putString("flutter.lastUpdateTime", java.text.SimpleDateFormat("HH:mm", java.util.Locale.KOREA).format(java.util.Date()))
                 apply()
             }

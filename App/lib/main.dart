@@ -10,14 +10,14 @@ import 'services/migration_service.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // 1. Firebase 초기화 (웹에서는 옵션이 없을 경우 대비 예외 처리)
+  // 1. Firebase 珥덇린??(?뱀뿉?쒕뒗 ?듭뀡???놁쓣 寃쎌슦 ?鍮??덉쇅 泥섎━)
   try {
     await Firebase.initializeApp();
   } catch (e) {
-    debugPrint("Firebase 초기화 건너뜀 (Web/Option 미비): $e");
+    debugPrint("Firebase 珥덇린??嫄대꼫? (Web/Option 誘몃퉬): $e");
   }
   
-  // 2. 위젯 백그라운드 자동 동기화 시작
+  // 2. ?꾩젽 諛깃렇?쇱슫???먮룞 ?숆린???쒖옉
   WidgetSyncService().start();
   
   runApp(const MyApp());
@@ -29,11 +29,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: '우리집 세금',
+      title: '?곕━吏??멸툑',
       debugShowCheckedModeBanner: false,
-      themeMode: ThemeMode.system, // 시스템 설정에 따라 자동 전환
+      themeMode: ThemeMode.system, // ?쒖뒪???ㅼ젙???곕씪 ?먮룞 ?꾪솚
       
-      // ☀️ 라이트 테마 (LToBank 스타일)
+      // ?截??쇱씠???뚮쭏 (MyHomeTax ?ㅽ???
       theme: ThemeData(
         brightness: Brightness.light,
         colorScheme: ColorScheme.fromSeed(
@@ -46,14 +46,14 @@ class MyApp extends StatelessWidget {
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.transparent,
           elevation: 0,
-          toolbarHeight: 0, // SliverAppBar 사용을 위해 숨김
+          toolbarHeight: 0, // SliverAppBar ?ъ슜???꾪빐 ?④?
         ),
         cardColor: Colors.white,
         useMaterial3: true,
         textTheme: GoogleFonts.notoSansKrTextTheme(ThemeData(brightness: Brightness.light).textTheme),
       ),
       
-      // 🌙 다크 테마 (세련된 딥 블루/그레이)
+      // ?뙔 ?ㅽ겕 ?뚮쭏 (?몃젴????釉붾（/洹몃젅??
       darkTheme: ThemeData(
         brightness: Brightness.dark,
         colorScheme: ColorScheme.fromSeed(

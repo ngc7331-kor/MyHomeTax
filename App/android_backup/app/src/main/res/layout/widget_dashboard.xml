@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:padding="0dp">
 
-    <!-- Background (80% Alpha, Sync with LToBank) -->
+    <!-- Background (80% Alpha, 최적화된 디자인) -->
     <ImageView
         android:id="@+id/widget_bg"
         android:layout_width="match_parent"
@@ -22,7 +22,7 @@
         android:gravity="end"
         android:paddingEnd="14dp"
         android:paddingBottom="4dp"
-        android:text="최종 확인: --:--"
+        android:text="理쒖쥌 ?뺤씤: --:--"
         android:textColor="#80FFFFFF"
         android:textSize="8sp" />
 
@@ -56,7 +56,7 @@
                 android:layout_height="wrap_content"
                 android:layout_toEndOf="@id/img_logo"
                 android:layout_marginStart="6dp"
-                android:text="우리집 세금"
+                android:text="?곕━吏??멸툑"
                 android:textColor="#FFFFFF"
                 android:textSize="14sp"
                 android:textStyle="bold"
@@ -76,7 +76,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="승인대기"
+                    android:text="?뱀씤?湲?
                     android:textColor="#FFFFFF"
                     android:textSize="9sp"
                     android:layout_marginEnd="3dp"
@@ -111,14 +111,14 @@
                     android:id="@+id/txt_left_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="채원"
+                    android:text="梨꾩썝"
                     android:textColor="#B3FFFFFF"
                     android:textSize="12sp" />
                 <TextView
                     android:id="@+id/txt_left_amount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="₩ 0"
+                    android:text="??0"
                     android:textColor="#FFFFFF"
                     android:textSize="16sp"
                     android:textStyle="bold" />
@@ -126,7 +126,7 @@
                     android:id="@+id/txt_left_refund"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="환급액: ₩ 0"
+                    android:text="?섍툒?? ??0"
                     android:textColor="#CCFFFFFF"
                     android:textSize="10sp" />
             </LinearLayout>
@@ -142,14 +142,14 @@
                     android:id="@+id/txt_right_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="도권"
+                    android:text="?꾧텒"
                     android:textColor="#B3FFFFFF"
                     android:textSize="12sp" />
                 <TextView
                     android:id="@+id/txt_right_amount"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="₩ 0"
+                    android:text="??0"
                     android:textColor="#FFFFFF"
                     android:textSize="16sp"
                     android:textStyle="bold" />
@@ -157,7 +157,7 @@
                     android:id="@+id/txt_right_refund"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="환급액: ₩ 0"
+                    android:text="?섍툒?? ??0"
                     android:textColor="#CCFFFFFF"
                     android:textSize="10sp" />
             </LinearLayout>

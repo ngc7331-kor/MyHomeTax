@@ -4,7 +4,7 @@ const html = `<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>우리집 세금</title>
+    <title>?怨뺚봺筌??硫명닊</title>
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="apple-touch-icon" href="favicon.png">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -31,10 +31,10 @@ const html = `<!DOCTYPE html>
 </head>
 <body>
     <img src="favicon.png" class="logo">
-    <div style="font-size: 24px; font-weight: bold;">우리집 세금</div>
+    <div style="font-size: 24px; font-weight: bold;">?怨뺚봺筌??硫명닊</div>
     <div class="spinner"></div>
-    <div id="msg">앱을 불러오는 중입니다...</div>
-    <a href="https://ngc7331-kor.github.io/LToBank/" class="btn">LToBank 바로가기</a>
+    <div id="msg">?源놁뱽 ?븍뜄???삳뮉 餓λ쵐???덈뼄...</div>
+    <a href="#" class="btn">MyHomeTax 獄쏅뗀以덂첎?疫?/a>
 </body>
 </html>`;
 fs.writeFileSync('index.html', html, 'utf8');

@@ -17,7 +17,7 @@ dependencies:
   shared_preferences: ^2.2.0
   google_fonts: ^6.1.0
   
-  # Firebase Dependencies (LToBank와 동기화)
+  # Firebase Dependencies (MyHomeTax? ?숆린??
   firebase_core: ^3.1.1
   firebase_auth: ^5.1.1
   cloud_firestore: ^5.0.2

@@ -18,28 +18,26 @@ class FCMService {
   Future<void> initialize() async {
     if (kIsWeb) return;
 
-    // 알림 권한 요청
+    // ?뚮┝ 沅뚰븳 ?붿껌
     await _fcm.requestPermission(alert: true, badge: true, sound: true);
 
-    // 로컬 알림 초기화
-    const androidInit = AndroidInitializationSettings('@mipmap/launcher_icon');
+    // 濡쒖뺄 ?뚮┝ 珥덇린??    const androidInit = AndroidInitializationSettings('@mipmap/launcher_icon');
     const iosInit = DarwinInitializationSettings();
     const initSettings = InitializationSettings(android: androidInit, iOS: iosInit);
     await _localNotifications.initialize(settings: initSettings);
 
-    // 알림 채널 생성
+    // ?뚮┝ 梨꾨꼸 ?앹꽦
     const channel = AndroidNotificationChannel(
       'myhometax_channel',
-      '우리집 세금 알림',
-      description: '세금 승인 및 요청 알림입니다.',
+      '?곕━吏??멸툑 ?뚮┝',
+      description: '?멸툑 ?뱀씤 諛??붿껌 ?뚮┝?낅땲??',
       importance: Importance.max,
     );
     await _localNotifications
         .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
         ?.createNotificationChannel(channel);
 
-    // 포그라운드 메시지 리스너
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    // ?ш렇?쇱슫??硫붿떆吏 由ъ뒪??    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       final notification = message.notification;
       if (notification != null) {
         _localNotifications.show(
@@ -63,7 +61,7 @@ class FCMService {
 
   Future<String?> getToken() async => await _fcm.getToken();
 
-  // 서비스 계정 키를 통한 액세스 토큰 획득
+  // ?쒕퉬??怨꾩젙 ?ㅻ? ?듯븳 ?≪꽭???좏겙 ?띾뱷
   Future<String?> _getAccessToken() async {
     try {
       final String jsonString = await rootBundle.loadString('assets/secrets/service-account.json');
@@ -79,27 +77,26 @@ class FCMService {
     }
   }
 
-  // 푸시 메시지 발송 (LToBank 로직 이식)
+  // ?몄떆 硫붿떆吏 諛쒖넚 (MyHomeTax 濡쒖쭅 ?댁떇)
   Future<void> sendPushMessage({
     required String targetRole, 
     required String title, 
     required String body
   }) async {
     try {
-      // 1. 타겟 유저 검색
-      final users = await FirebaseFirestore.instance.collection('users').where('role', isEqualTo: targetRole).get();
+      // 1. ?寃??좎? 寃??      final users = await FirebaseFirestore.instance.collection('users').where('role', isEqualTo: targetRole).get();
       if (users.docs.isEmpty) return;
 
       final targetToken = users.docs.first.data()['fcmToken'];
       if (targetToken == null) return;
 
-      // 2. 토큰 및 프로젝트 ID 획득
+      // 2. ?좏겙 諛??꾨줈?앺듃 ID ?띾뱷
       final String jsonString = await rootBundle.loadString('assets/secrets/service-account.json');
       final projectId = jsonDecode(jsonString)['project_id'];
       final accessToken = await _getAccessToken();
       if (accessToken == null || projectId == null) return;
 
-      // 3. 발송
+      // 3. 諛쒖넚
       await http.post(
         Uri.parse('https://fcm.googleapis.com/v1/projects/$projectId/messages:send'),
         headers: {

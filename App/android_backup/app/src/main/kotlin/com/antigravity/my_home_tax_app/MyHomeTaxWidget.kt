@@ -58,16 +58,16 @@ class MyHomeTaxWidget : AppWidgetProvider() {
         private const val KEY_UPDATE_TIME = "updateTime"
 
         fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
-            // HomeWidget은 기본적으로 'HomeWidgetPreferences'를 사용하므로 최우선 순위로 설정
+            // HomeWidget? 湲곕낯?곸쑝濡?'HomeWidgetPreferences'瑜??ъ슜?섎?濡?理쒖슦???쒖쐞濡??ㅼ젙
             val prefsFiles = arrayOf("HomeWidgetPreferences", "com.antigravity.my_home_tax_app_preferences", "FlutterSharedPreferences")
             var finalSharedPrefs: SharedPreferences? = null
             
             for (fileName in prefsFiles) {
                 val sp = context.getSharedPreferences(fileName, Context.MODE_PRIVATE)
-                // isLoggedIn 또는 flutter.isLoggedIn 중 하나라도 있으면 해당 파일을 사용
+                // isLoggedIn ?먮뒗 flutter.isLoggedIn 以??섎굹?쇰룄 ?덉쑝硫??대떦 ?뚯씪???ъ슜
                 if (sp.contains("flutter.$KEY_IS_LOGGED_IN") || sp.contains(KEY_IS_LOGGED_IN)) {
                     finalSharedPrefs = sp
-                    if (fileName == "HomeWidgetPreferences") break // 최우선 순위 파일이면 즉시 중단
+                    if (fileName == "HomeWidgetPreferences") break // 理쒖슦???쒖쐞 ?뚯씪?대㈃ 利됱떆 以묐떒
                 }
             }
             
@@ -109,7 +109,7 @@ class MyHomeTaxWidget : AppWidgetProvider() {
             views.setInt(R.id.widget_bg, "setImageAlpha", 204)
 
             try {
-                // 🔐 로그인 상태 무결성 강화 (v34: LToBank 스타일)
+                // ?뵍 濡쒓렇???곹깭 臾닿껐??媛뺥솕 (v34: MyHomeTax ?ㅽ???
                 val isLoggedIn = getSafeBool(KEY_IS_LOGGED_IN, false)
                 val userRole = getSafeString(KEY_USER_ROLE, "")
 
@@ -121,18 +121,18 @@ class MyHomeTaxWidget : AppWidgetProvider() {
                     views.setViewVisibility(R.id.layout_data_container, View.VISIBLE)
                     
                     val pendingCount = getSafeInt(KEY_PENDING, 0)
-                    val cwTotal = getSafeString(KEY_CW_TOTAL, "₩ 0")
-                    val cwRefund = getSafeString(KEY_CW_REFUND, "환급액: ₩ 0")
-                    val dkTotal = getSafeString(KEY_DK_TOTAL, "₩ 0")
-                    val dkRefund = getSafeString(KEY_DK_REFUND, "환급액: ₩ 0")
+                    val cwTotal = getSafeString(KEY_CW_TOTAL, "??0")
+                    val cwRefund = getSafeString(KEY_CW_REFUND, "?섍툒?? ??0")
+                    val dkTotal = getSafeString(KEY_DK_TOTAL, "??0")
+                    val dkRefund = getSafeString(KEY_DK_REFUND, "?섍툒?? ??0")
                     val updateTime = getSafeString(KEY_UPDATE_TIME, "--:--")
 
-                    views.setTextViewText(R.id.txt_widget_title, "우리집 세금")
+                    views.setTextViewText(R.id.txt_widget_title, "?곕━吏??멸툑")
                     views.setTextViewText(R.id.txt_pending_count, pendingCount.toString())
                     views.setViewVisibility(R.id.layout_badge, if (pendingCount > 0) View.VISIBLE else View.GONE)
 
                     if (userRole == "parent") {
-                        views.setTextViewText(R.id.txt_badge_label, "승인대기")
+                        views.setTextViewText(R.id.txt_badge_label, "?뱀씤?湲?)
                         views.setViewVisibility(R.id.layout_left, View.VISIBLE)
                         views.setViewVisibility(R.id.txt_left_name, View.VISIBLE)
                         views.setViewVisibility(R.id.layout_left_vertical, View.VISIBLE)
@@ -148,31 +148,27 @@ class MyHomeTaxWidget : AppWidgetProvider() {
                         views.setTextViewText(R.id.txt_right_amount_v, dkTotal)
                         views.setTextViewText(R.id.txt_right_refund_v, dkRefund)
                     } else {
-                        // 🧒 자녀 계정 레이아웃 (v34: 이름 숨기기 및 수직 반응형 배치)
-                        views.setTextViewText(R.id.txt_badge_label, "승인 요청 중")
-                        val cleanAmt = { amt: String -> amt.replace("환급액: ", "") }
+                        // ?쭜 ?먮? 怨꾩젙 ?덉씠?꾩썐 (v34: ?대쫫 ?④린湲?諛??섏쭅 諛섏쓳??諛곗튂)
+                        views.setTextViewText(R.id.txt_badge_label, "?뱀씤 ?붿껌 以?)
+                        val cleanAmt = { amt: String -> amt.replace("?섍툒?? ", "") }
 
                         if (userRole == "cw") {
                             views.setViewVisibility(R.id.layout_left, View.VISIBLE)
-                            views.setViewVisibility(R.id.txt_left_name, View.GONE) // 이름 숨기기
-                            views.setViewVisibility(R.id.layout_left_vertical, View.GONE)
-                            views.setViewVisibility(R.id.layout_left_vertical_child, View.VISIBLE) // 수직 배치 활성화
-                            views.setViewVisibility(R.id.layout_right, View.GONE)
+                            views.setViewVisibility(R.id.txt_left_name, View.GONE) // ?대쫫 ?④린湲?                            views.setViewVisibility(R.id.layout_left_vertical, View.GONE)
+                            views.setViewVisibility(R.id.layout_left_vertical_child, View.VISIBLE) // ?섏쭅 諛곗튂 ?쒖꽦??                            views.setViewVisibility(R.id.layout_right, View.GONE)
                             
                             views.setTextViewText(R.id.txt_left_amount_c, cwTotal)
                             views.setTextViewText(R.id.txt_left_refund_c, cleanAmt(cwRefund))
                         } else {
                             views.setViewVisibility(R.id.layout_left, View.GONE)
                             views.setViewVisibility(R.id.layout_right, View.VISIBLE)
-                            views.setViewVisibility(R.id.txt_right_name, View.GONE) // 이름 숨기기
-                            views.setViewVisibility(R.id.layout_right_vertical, View.GONE)
-                            views.setViewVisibility(R.id.layout_right_vertical_child, View.VISIBLE) // 수직 배치 활성화
-                            
+                            views.setViewVisibility(R.id.txt_right_name, View.GONE) // ?대쫫 ?④린湲?                            views.setViewVisibility(R.id.layout_right_vertical, View.GONE)
+                            views.setViewVisibility(R.id.layout_right_vertical_child, View.VISIBLE) // ?섏쭅 諛곗튂 ?쒖꽦??                            
                             views.setTextViewText(R.id.txt_right_amount_c, dkTotal)
                             views.setTextViewText(R.id.txt_right_refund_c, cleanAmt(dkRefund))
                         }
                     }
-                    views.setTextViewText(R.id.txt_last_updated, "최종 확인: $updateTime")
+                    views.setTextViewText(R.id.txt_last_updated, "理쒖쥌 ?뺤씤: $updateTime")
                 }
 
                 val appIntent = Intent(context, MainActivity::class.java)
