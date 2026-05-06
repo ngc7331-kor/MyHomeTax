@@ -1,0 +1,49 @@
+name: my_home_tax_app
+description: "A new Flutter project."
+publish_to: "none"
+
+version: 1.0.0+61
+
+environment:
+  sdk: ^3.10.8
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.2
+  webview_flutter: ^4.2.2
+  home_widget: ^0.9.0
+  shared_preferences: ^2.2.0
+  google_fonts: ^6.1.0
+  
+  # Firebase Dependencies (LToBank와 동기화)
+  firebase_core: ^3.1.1
+  firebase_auth: ^5.1.1
+  cloud_firestore: ^5.0.2
+  google_sign_in: ^6.2.1
+  firebase_messaging: ^15.2.10
+  flutter_local_notifications: ^21.0.0
+  http: ^1.2.1
+  googleapis_auth: ^2.0.0
+  intl: ^0.18.1
+  rxdart: ^0.27.7
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+  flutter_launcher_icons: ^0.14.4
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/app-icon.jpg"
+  adaptive_icon_background: "#1f3243"
+  adaptive_icon_foreground: "assets/app-icon.jpg"
+  min_sdk_android: 21
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:gravity="center"
+    android:background="#121212">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="위젯 투명도 설정"
+        android:textColor="#FFFFFF"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="32dp"/>
+
+    <TextView
+        android:id="@+id/tv_transparency_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="투명도: 70%"
+        android:textColor="#E0E0E0"
+        android:textSize="16sp"
+        android:layout_marginBottom="8dp"/>
+
+    <!-- Seekbar for Alpha (0-100%) -->
+    <SeekBar
+        android:id="@+id/seekbar_transparency"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="100"
+        android:progress="70"
+        android:progressTint="#2196F3"
+        android:thumbTint="#2196F3"
+        android:layout_marginBottom="32dp"/>
+
+    <Button
+        android:id="@+id/btn_save_config"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="적용하기"
+        android:backgroundTint="#2196F3"
+        android:textColor="#FFFFFF"
+        android:textSize="16sp"
+        android:padding="12dp"/>
+
+</LinearLayout>
