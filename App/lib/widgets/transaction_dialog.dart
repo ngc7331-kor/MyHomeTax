@@ -3,7 +3,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
 class TransactionDialog extends StatefulWidget {
-  const TransactionDialog({super.key});
+  final String cwName;
+  final String dkName;
+  const TransactionDialog({super.key, required this.cwName, required this.dkName});
 
   @override
   State<TransactionDialog> createState() => _TransactionDialogState();
@@ -37,9 +39,9 @@ class _TransactionDialogState extends State<TransactionDialog> {
               if (_isJoint) 
                 _buildTextField(_amountCwController, '공동 금액 (입금+, 출금-)', Icons.money)
               else ...[
-                _buildTextField(_amountCwController, '채원 금액', Icons.person, color: Colors.pinkAccent),
+                _buildTextField(_amountCwController, '${widget.cwName} 금액', Icons.person, color: Colors.pinkAccent),
                 const SizedBox(height: 12),
-                _buildTextField(_amountDkController, '도권 금액', Icons.person, color: Colors.lightBlueAccent),
+                _buildTextField(_amountDkController, '${widget.dkName} 금액', Icons.person, color: Colors.lightBlueAccent),
               ],
             ],
           ),

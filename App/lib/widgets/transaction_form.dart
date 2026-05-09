@@ -5,7 +5,9 @@ import '../services/database_service.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class TransactionForm extends StatefulWidget {
-  const TransactionForm({super.key});
+  final String cwName;
+  final String dkName;
+  const TransactionForm({super.key, required this.cwName, required this.dkName});
 
   @override
   State<TransactionForm> createState() => _TransactionFormState();
@@ -288,7 +290,7 @@ class _TransactionFormState extends State<TransactionForm> {
     return Row(
       children: targets.map((t) {
         bool isSelected = _target == t;
-        String label = t == 'cw' ? '채원' : (t == 'dk' ? '도권' : '함께');
+        String label = t == 'cw' ? widget.cwName : (t == 'dk' ? widget.dkName : '함께');
         return Expanded(
           child: GestureDetector(
             onTap: () {

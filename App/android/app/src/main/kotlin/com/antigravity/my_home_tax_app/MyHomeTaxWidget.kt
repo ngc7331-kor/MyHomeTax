@@ -42,8 +42,8 @@ class MyHomeTaxWidget : AppWidgetProvider() {
                     val dkRefund = prefs.getString("dkRefund", "환급액: ₩ 0") ?: "환급액: ₩ 0"
                     val updateTime = prefs.getString("updateTime", "--:--") ?: "--:--"
                     
-                    val cwName = prefs.getString("cwName", "채원") ?: "채원"
-                    val dkName = prefs.getString("dkName", "도권") ?: "도권"
+                    val cwName = prefs.getString("cwName", "자녀1") ?: "자녀1"
+                    val dkName = prefs.getString("dkName", "자녀2") ?: "자녀2"
 
                     views.setTextViewText(R.id.txt_widget_title, "우리집 세금")
                     

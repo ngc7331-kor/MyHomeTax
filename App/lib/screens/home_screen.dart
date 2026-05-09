@@ -7,7 +7,7 @@ import 'package:rxdart/rxdart.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:intl/intl.dart';
 import '../services/database_service.dart';
-import '../services/migration_service.dart';
+// removed migration_service import
 import '../widgets/transaction_form.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -29,11 +29,27 @@ class _HomeScreenState extends State<HomeScreen> {
   int _annualYear = DateTime.now().year;
   int _annualLimit = 30;
 
+  // 동적 이름 상태
+  String cwName = '자녀1';
+  String dkName = '자녀2';
+
   @override
   void initState() {
     super.initState();
-    // v6 정밀 복구 엔진 가동
-    MigrationService.runMigration();
+    _fetchNames();
+  }
+
+  Future<void> _fetchNames() async {
+    try {
+      final cwDoc = await FirebaseFirestore.instance.collection('taxes').doc('cw').get();
+      final dkDoc = await FirebaseFirestore.instance.collection('taxes').doc('dk').get();
+      if (mounted) {
+        setState(() {
+          cwName = cwDoc.data()?['name'] ?? '자녀1';
+          dkName = dkDoc.data()?['name'] ?? '자녀2';
+        });
+      }
+    } catch (_) {}
   }
 
   // 위젯 동기화 로직 (v32.4 - 세액, 환급액, 대기건수 통합)
@@ -305,16 +321,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 if (isAdmin || isCw) 
                   Expanded(
                     child: GestureDetector(
-                      onTap: () => _showTaxDetailDialog('채원', cwBalance, cwRefundYear, cwHistory),
-                      child: _buildModernCard('채원', cwBalance, cwRefundYear, Colors.pink.shade50, Colors.pinkAccent),
+                      onTap: () => _showTaxDetailDialog(cwTaxDoc.name.isNotEmpty ? cwTaxDoc.name : '자녀1', cwBalance, cwRefundYear, cwHistory),
+                      child: _buildModernCard(cwTaxDoc.name.isNotEmpty ? cwTaxDoc.name : '자녀1', cwBalance, cwRefundYear, Colors.pink.shade50, Colors.pinkAccent),
                     ),
                   ),
                 if (isAdmin) const SizedBox(width: 15),
                 if (isAdmin || isDk)
                   Expanded(
                     child: GestureDetector(
-                      onTap: () => _showTaxDetailDialog('도권', dkBalance, dkRefundYear, dkHistory),
-                      child: _buildModernCard('도권', dkBalance, dkRefundYear, Colors.blue.shade50, Colors.blueAccent),
+                      onTap: () => _showTaxDetailDialog(dkTaxDoc.name.isNotEmpty ? dkTaxDoc.name : '자녀2', dkBalance, dkRefundYear, dkHistory),
+                      child: _buildModernCard(dkTaxDoc.name.isNotEmpty ? dkTaxDoc.name : '자녀2', dkBalance, dkRefundYear, Colors.blue.shade50, Colors.blueAccent),
                     ),
                   ),
               ],
@@ -441,7 +457,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Expanded(
                 flex: 2,
                 child: Text(
-                  tx.requester == 'cw' ? "채원" : "도권",
+                  tx.requester == 'cw' ? cwName : dkName,
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: isNarrow ? 11 : 13),
                 ),
               ),
@@ -520,7 +536,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 12),
               const Divider(height: 1, color: Colors.white10),
               const SizedBox(height: 20),
-              _buildDetailRow('대상', tx.requester == 'cw' ? '채원' : '도권'),
+              _buildDetailRow('대상', tx.requester == 'cw' ? cwName : dkName),
               _buildDetailRow('날짜', DateFormat('yyyy년 MM월 dd일').format(tx.timestamp)),
               _buildDetailRow('금액', format.format(tx.amount), valueColor: isPayment ? Colors.green : Colors.red),
               if (tx.isMembership) _buildDetailRow('항목', '🏆 회비'),
@@ -716,7 +732,7 @@ class _HomeScreenState extends State<HomeScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => const TransactionForm(),
+      builder: (context) => TransactionForm(cwName: cwName, dkName: dkName),
     );
   }
 
@@ -807,7 +823,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     Text(tx.description, style: GoogleFonts.notoSansKr(fontWeight: FontWeight.bold, fontSize: 16)),
                     const SizedBox(height: 4),
                     Text(
-                      '${tx.requester == 'cw' ? '채원' : '도권'} • ${format.format(tx.amount)}',
+                      '${tx.requester == 'cw' ? cwName : dkName} • ${format.format(tx.amount)}',
                       style: GoogleFonts.notoSansKr(color: isDark ? Colors.white70 : Colors.black54, fontSize: 14),
                     ),
                   ],
@@ -1147,8 +1163,8 @@ class _HomeScreenState extends State<HomeScreen> {
   String _getDisplayName(String? email) {
     final role = _getUserRole(email);
     if (role == 'parent') return '태오';
-    if (role == 'cw') return '채원';
-    if (role == 'dk') return '도권';
+    if (role == 'cw') return cwName;
+    if (role == 'dk') return dkName;
     return '사용자';
   }
 
