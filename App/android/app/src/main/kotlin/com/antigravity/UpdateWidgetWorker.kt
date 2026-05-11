@@ -1,4 +1,4 @@
-package com.antigravity.my_home_tax_app
+package com.antigravity
 
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
@@ -24,8 +24,8 @@ class UpdateWidgetWorker(context: Context, params: WorkerParameters) : Worker(co
             
             if (!isLoggedIn || userEmail.isEmpty()) return Result.success()
 
-            val proj = "gen-lang-client-0437258233"
-            val key = "AIzaSyAltn1UfyietG8WuOPQOWghv0q2jrndFKk"
+            val proj = "gen-lang-client-0120628657"
+            val key = "YOUR_API_KEY_HERE"
 
             // ??녔닼?Fetch Role & Names
             val uUrl = "https://firestore.googleapis.com/v1/projects/" + proj + "/databases/(default)/documents/users/" + userEmail + "?key=" + key

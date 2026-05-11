@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace "com.antigravity.my_home_tax_app"
+    namespace "com.antigravity"
     compileSdk 36
     ndkVersion flutter.ndkVersion
 
@@ -21,7 +21,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.antigravity.my_home_tax_app"
+        applicationId "com.antigravity"
         minSdkVersion flutter.minSdkVersion
         targetSdkVersion 35
         versionCode flutter.versionCode

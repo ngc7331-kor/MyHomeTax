@@ -1,4 +1,4 @@
-﻿<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
@@ -9,7 +9,7 @@
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon">
         
-        <receiver android:name="com.antigravity.my_home_tax_app.MyHomeTaxWidget"
+        <receiver android:name="com.antigravity.MyHomeTaxWidget"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
