@@ -2,7 +2,7 @@ name: my_home_tax
 description: "A new Flutter project."
 publish_to: "none"
 
-version: 1.0.0+85
+version: 1.0.0+86
 
 environment:
   sdk: ^3.10.8
