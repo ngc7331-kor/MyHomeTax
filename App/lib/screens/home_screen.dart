@@ -7,8 +7,10 @@ import 'package:rxdart/rxdart.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:intl/intl.dart';
 import '../services/database_service.dart';
-// removed migration_service import
+import '../services/migration_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/transaction_form.dart';
+import '../services/secrets_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -29,14 +31,98 @@ class _HomeScreenState extends State<HomeScreen> {
   int _annualYear = DateTime.now().year;
   int _annualLimit = 30;
 
-  // 동적 이름 상태
-  String cwName = '자녀1';
-  String dkName = '자녀2';
+  // 동적 이름 상태 (기본값을 채원, 도권으로 한글 실명화)
+  String cwName = '채원';
+  String dkName = '도권';
 
   @override
   void initState() {
     super.initState();
-    _fetchNames();
+    SecretsService().load().then((_) {
+      if (mounted) {
+        setState(() {
+          cwName = SecretsService().cwName;
+          dkName = SecretsService().dkName;
+        });
+      }
+      _fetchNames();
+      _checkAndInitDatabase().then((_) {
+        final email = _auth.currentUser?.email;
+        final role = _getUserRole(email);
+        if (role == 'parent') {
+          MigrationService.runMigration();
+        }
+      });
+    });
+  }
+
+  Future<void> _checkAndInitDatabase() async {
+    final user = _auth.currentUser;
+    if (user == null || !SecretsService().isParent(user.email)) return;
+
+    final db = FirebaseFirestore.instance;
+
+    // 1. users 컬렉션에 자녀들의 구글 계정 및 권한 등록
+    try {
+      final users = [
+        ...SecretsService().parentEmails.map((e) => {'email': e, 'role': 'parent'}),
+        ...SecretsService().cwEmails.map((e) => {'email': e, 'role': 'cw'}),
+        ...SecretsService().dkEmails.map((e) => {'email': e, 'role': 'dk'}),
+      ];
+
+      for (final u in users) {
+        await db.collection('users').doc(u['email']!).set({
+          'role': u['role']
+        }, SetOptions(merge: true));
+      }
+      debugPrint("✅ 1. Users initialized successfully.");
+    } catch (e) {
+      debugPrint("❌ 1. Users init error: $e");
+    }
+
+    // 2. config/widget 문서 및 taxes/cw, taxes/dk에 전역 자녀 이름 설정 등록
+    try {
+      await db.collection('config').doc('widget').set({
+        'cwName': SecretsService().cwName,
+        'dkName': SecretsService().dkName
+      }, SetOptions(merge: true));
+
+      await db.collection('taxes').doc('cw').set({
+        'name': SecretsService().cwName
+      }, SetOptions(merge: true));
+
+      await db.collection('taxes').doc('dk').set({
+        'name': SecretsService().dkName
+      }, SetOptions(merge: true));
+      debugPrint("✅ 2. Names initialized successfully.");
+    } catch (e) {
+      debugPrint("❌ 2. Names init error: $e");
+    }
+
+    // 3. 위젯 sharedPreferences에도 즉시 반영
+    try {
+      await HomeWidget.saveWidgetData('cwName', SecretsService().cwName);
+      await HomeWidget.saveWidgetData('dkName', SecretsService().dkName);
+      await HomeWidget.updateWidget(name: 'MyHomeTaxWidget');
+      debugPrint("✅ 3. Widget shared prefs updated.");
+    } catch (e) {
+      debugPrint("❌ 3. Widget shared prefs error: $e");
+    }
+
+    // 4. 기존의 오염된 '나' 임의 테스트 데이터(transactions) 및 오염 유입 원천 완전 청소
+    try {
+      final transactionsSnap = await db.collection('transactions').get();
+      for (var doc in transactionsSnap.docs) {
+        final data = doc.data();
+        final userField = data['user']?.toString() ?? data['name']?.toString() ?? '';
+        if (userField == '나' || userField.isEmpty || userField.contains('테스트')) {
+          await doc.reference.delete();
+        }
+      }
+      debugPrint("✅ 4. Polluted transactions cleaned up.");
+    } catch (e) {
+      debugPrint("❌ 4. Polluted transactions clean error: $e");
+    }
   }
 
   Future<void> _fetchNames() async {
@@ -45,8 +131,8 @@ class _HomeScreenState extends State<HomeScreen> {
       final dkDoc = await FirebaseFirestore.instance.collection('taxes').doc('dk').get();
       if (mounted) {
         setState(() {
-          cwName = cwDoc.data()?['name'] ?? '자녀1';
-          dkName = dkDoc.data()?['name'] ?? '자녀2';
+          cwName = cwDoc.data()?['name'] ?? SecretsService().cwName;
+          dkName = dkDoc.data()?['name'] ?? SecretsService().dkName;
         });
       }
     } catch (_) {}
@@ -258,17 +344,30 @@ class _HomeScreenState extends State<HomeScreen> {
     final isCw = role == 'cw';
     final isDk = role == 'dk';
     
-    return StreamBuilder<List<TaxTransaction>>(
+    return StreamBuilder<Map<String, dynamic>>(
       stream: isAdmin 
-        ? Rx.combineLatest2(
+        ? Rx.combineLatest3(
             _dbService.getTransactions('cw', limit: 2000),
             _dbService.getTransactions('dk', limit: 2000),
-            (cwTxs, dkTxs) => [...cwTxs, ...dkTxs],
+            _dbService.getPendingApprovals(), // 부모는 모든 대기 내역을 조회하여 건수 집계
+            (cwTxs, dkTxs, approvals) => {
+              'allTxs': [...cwTxs, ...dkTxs],
+              'pendingCount': approvals.length,
+            },
           )
-        : _dbService.getTransactions(role, limit: 2000),
+        : Rx.combineLatest2(
+            _dbService.getTransactions(role, limit: 2000),
+            _dbService.getPendingApprovals(userId: role), // 자녀는 본인 대기 내역만 조회
+            (txs, approvals) => {
+              'allTxs': txs,
+              'pendingCount': approvals.length,
+            },
+          ),
       builder: (context, snapshot) {
         if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
-        final all = snapshot.data!;
+        final data = snapshot.data!;
+        final all = data['allTxs'] as List<TaxTransaction>;
+        final pendingCount = data['pendingCount'] as int;
 
         return StreamBuilder<List<TaxData>>(
           stream: Rx.combineLatest2(
@@ -310,7 +409,7 @@ class _HomeScreenState extends State<HomeScreen> {
               _updateWidgets(
                 totalCw: cwBalance, totalDk: dkBalance,
                 refundCw: cwRefundYear, refundDk: dkRefundYear,
-                pendingCount: all.where((t) => t.status == 'pending').length,
+                pendingCount: pendingCount,
                 userRole: role,
               );
             });
@@ -321,16 +420,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 if (isAdmin || isCw) 
                   Expanded(
                     child: GestureDetector(
-                      onTap: () => _showTaxDetailDialog(cwTaxDoc.name.isNotEmpty ? cwTaxDoc.name : '자녀1', cwBalance, cwRefundYear, cwHistory),
-                      child: _buildModernCard(cwTaxDoc.name.isNotEmpty ? cwTaxDoc.name : '자녀1', cwBalance, cwRefundYear, Colors.pink.shade50, Colors.pinkAccent),
+                      onTap: () => _showTaxDetailDialog(cwTaxDoc.name.isNotEmpty ? cwTaxDoc.name : '채원', cwBalance, cwRefundYear, cwHistory),
+                      child: _buildModernCard(cwTaxDoc.name.isNotEmpty ? cwTaxDoc.name : '채원', cwBalance, cwRefundYear, Colors.pink.shade50, Colors.pinkAccent),
                     ),
                   ),
                 if (isAdmin) const SizedBox(width: 15),
                 if (isAdmin || isDk)
                   Expanded(
                     child: GestureDetector(
-                      onTap: () => _showTaxDetailDialog(dkTaxDoc.name.isNotEmpty ? dkTaxDoc.name : '자녀2', dkBalance, dkRefundYear, dkHistory),
-                      child: _buildModernCard(dkTaxDoc.name.isNotEmpty ? dkTaxDoc.name : '자녀2', dkBalance, dkRefundYear, Colors.blue.shade50, Colors.blueAccent),
+                      onTap: () => _showTaxDetailDialog(dkTaxDoc.name.isNotEmpty ? dkTaxDoc.name : '도권', dkBalance, dkRefundYear, dkHistory),
+                      child: _buildModernCard(dkTaxDoc.name.isNotEmpty ? dkTaxDoc.name : '도권', dkBalance, dkRefundYear, Colors.blue.shade50, Colors.blueAccent),
                     ),
                   ),
               ],
@@ -1162,16 +1261,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   String _getDisplayName(String? email) {
     final role = _getUserRole(email);
-    if (role == 'parent') return '태오';
+    if (role == 'parent') return SecretsService().parentName;
     if (role == 'cw') return cwName;
     if (role == 'dk') return dkName;
     return '사용자';
   }
 
   String _getUserRole(String? email) {
-    if (email == 'taeoh0311@gmail.com') return 'parent';
-    if (email == 'ngc7331cw@gmail.com' || email == 'taeoh0317@gmail.com') return 'cw';
-    if (email == 'ngc7331dk@gmail.com' || email == 'taeoh0318@gmail.com') return 'dk';
-    return 'none';
+    return SecretsService().getUserRole(email);
   }
 }

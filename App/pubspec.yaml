@@ -2,7 +2,7 @@ name: my_home_tax
 description: "A new Flutter project."
 publish_to: "none"
 
-version: 1.0.0+88
+version: 1.0.0+89
 
 environment:
   sdk: ^3.10.8
@@ -47,3 +47,4 @@ flutter:
   uses-material-design: true
   assets:
     - assets/
+    - assets/secrets/secrets.json

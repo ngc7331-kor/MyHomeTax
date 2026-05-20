@@ -25,7 +25,7 @@ class UpdateWidgetWorker(context: Context, params: WorkerParameters) : Worker(co
             if (!isLoggedIn || userEmail.isEmpty()) return Result.success()
 
             val proj = "gen-lang-client-0120628657"
-            val key = "YOUR_API_KEY_HERE"
+            val key = "AIzaSyCYuTmpedfkoi3ivGPu0tP00GFIUbrTSvo"
 
             // ??녔닼?Fetch Role & Names
             val uUrl = "https://firestore.googleapis.com/v1/projects/" + proj + "/databases/(default)/documents/users/" + userEmail + "?key=" + key
@@ -42,14 +42,15 @@ class UpdateWidgetWorker(context: Context, params: WorkerParameters) : Worker(co
             // Fetch Global Config
             val cUrl = "https://firestore.googleapis.com/v1/projects/" + proj + "/databases/(default)/documents/config/widget?key=" + key
             val cRes = client.newCall(Request.Builder().url(cUrl).build()).execute()
-            if (cRes.isSuccessful) {
+            val isSyncSuccessful = cRes.isSuccessful
+            if (isSyncSuccessful) {
                 val f = JSONObject(cRes.body?.string() ?: "{}").getJSONObject("fields")
                 val cwN = f.getJSONObject("cwName").getString("stringValue")
                 val dkN = f.getJSONObject("dkName").getString("stringValue")
                 prefs.edit().putString("cwName", cwN).putString("dkName", dkN).apply()
             }
 
-            // ?逾?Fetch Approvals (No Masking for robustness)
+            // Fetch Approvals (No Masking for robustness)
             val pUrl = "https://firestore.googleapis.com/v1/projects/" + proj + "/databases/(default)/documents/approvals?key=" + key
             val res1 = client.newCall(Request.Builder().url(pUrl).build()).execute()
             
@@ -78,6 +79,9 @@ class UpdateWidgetWorker(context: Context, params: WorkerParameters) : Worker(co
                     }
                 }
                 prefs.edit().putInt("pendingCount", pCount).putString("workerStatus", "active").apply()
+            } else if (res1.code == 404 && isSyncSuccessful) {
+                // 타 연동(config)은 정상이나 approvals만 404가 발생했다면, 승인 요청 데이터가 단순히 비어 있는 상태이므로 active로 처리
+                prefs.edit().putInt("pendingCount", 0).putString("workerStatus", "active").apply()
             } else {
                 prefs.edit().putString("workerStatus", "vacation").apply()
             }
